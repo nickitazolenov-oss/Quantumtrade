@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Cyclone — Terminal & Verification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #040811;      /* Глубокий черный */
+      --bg-panel: #0a1124;     /* Темно-синий для панелей */
+      --bg-card: #121b36;      /* Светлее для карточек/кнопок */
+      --blue-neon: #3b82f6;    /* Яркий синий */
+      --blue-glow: #1d4ed8;    /* Синий для свечения */
+      --border-color: #1e293b; /* Границы */
+      --text-main: #f8fafc;    /* Основной текст */
+      --text-muted: #64748b;   /* Приглушенный текст */
+      --green-pixel: #00ffaa;  /* Вспомогательный для CALL / Успеха */
+      --red-pixel: #ff3366;    /* Вспомогательный для PUT / Ошибок */
+      
+      --pixel-border: 3px solid #3b82f6;
+      --font-retro: 'Press Start 2P', cursive;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Эффект пиксельной сетки на фоне */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Холст для анимации пикселей под курсором */
+    #pixelCanvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── ШАПКА САЙТА (HEADER) ── */
+    .header {
+      background: var(--bg-panel);
+      border-bottom: 4px solid var(--blue-neon);
+      padding: 12px 24px;
+      min-height: 64px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-retro);
+      font-size: 0.85rem;
+      color: var(--text-main);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--blue-neon); }
+
+    .logo-box {
+      width: 24px; height: 24px;
+      background: var(--blue-neon);
+      border: 2px solid #fff;
+      box-shadow: 2px 2px 0px #000;
+      flex-shrink: 0;
+    }
+
+    .nav { 
+      display: flex; 
+      gap: 4px; 
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 2px solid transparent;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: all 0.15s steps(2);
+    }
+
+    .nav-btn:hover {
+      color: var(--blue-neon);
+      border-bottom: 2px solid var(--blue-neon);
+    }
+
+    .nav-btn.active {
+      color: var(--text-main);
+      background: var(--bg-card);
+      border: 2px solid var(--blue-neon);
+      box-shadow: 3px 3px 0px var(--blue-glow);
+    }
+
+    .auth-actions { 
+      display: flex; 
+      gap: 12px; 
+      align-items: center; 
+      flex-wrap: wrap;
+    }
+
+    /* Стильный пиксельный селектор языков */
+    .lang-select-wrapper {
+      position: relative;
+    }
+    .lang-select {
+      background: var(--bg-dark);
+      border: 2px solid var(--blue-neon);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      outline: none;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--blue-glow);
+    }
+    .lang-select option {
+      background: var(--bg-panel);
+      color: var(--text-main);
+    }
+
+    .user-profile-info {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .user-email-display {
+      font-size: 0.85rem;
+      color: var(--blue-neon);
+      border-bottom: 1px dashed var(--blue-neon);
+      padding-bottom: 2px;
+      word-break: break-all;
+    }
+
+    .btn-pixel {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 8px 16px;
+      cursor: pointer;
+      border: 2px solid var(--blue-neon);
+      background: var(--bg-card);
+      color: var(--text-main);
+      box-shadow: 3px 3px 0px var(--blue-glow);
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      transition: all 0.1s steps(2);
+    }
+
+    .btn-pixel:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px var(--blue-neon);
+    }
+
+    .btn-pixel:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--blue-glow);
+    }
+
+    .btn-pixel.primary {
+      background: var(--blue-neon);
+      border: 2px solid #fff;
+      color: #000;
+      box-shadow: 3px 3px 0px var(--bg-card);
+    }
+    .btn-pixel.primary:hover { box-shadow: 4px 4px 0px #fff; }
+    
+    .btn-pixel.danger {
+      border-color: var(--red-pixel);
+      box-shadow: 3px 3px 0px rgba(255, 51, 102, 0.4);
+    }
+    .btn-pixel.danger:hover { box-shadow: 4px 4px 0px var(--red-pixel); }
+
+    /* ── КОНТЕНТНЫЕ СЕКЦИИ ── */
+    .container {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    .tab-content {
+      display: none;
+      animation: pixelateIn 0.3s steps(4);
+    }
+
+    .tab-content.active { display: block; }
+
+    @keyframes pixelateIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pixel-panel {
+      background: var(--bg-panel);
+      border: 3px solid var(--border-color);
+      box-shadow: 6px 6px 0px #040811;
+      padding: 24px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .pixel-panel.accent {
+      border-color: var(--blue-neon);
+      box-shadow: 6px 6px 0px var(--blue-glow);
+    }
+
+    .panel-title {
+      font-family: var(--font-retro);
+      font-size: 1rem;
+      line-height: 1.4;
+      margin-bottom: 20px;
+      color: var(--blue-neon);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    p { line-height: 1.6; color: #cbd5e1; margin-bottom: 16px; font-size: 0.95rem; }
+
+    /* ── СТРАНИЦА: ГЛАВНАЯ ── */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .hero-title {
+      font-family: var(--font-retro);
+      font-size: 1.4rem;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+    .hero-title span { color: var(--blue-neon); }
+
+    .mock-chart {
+      height: 220px;
+      background: var(--bg-dark);
+      border: 2px dashed var(--blue-neon);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    
+    .mock-chart-line {
+      position: absolute;
+      width: 100%; height: 100%;
+      stroke: var(--blue-neon);
+      stroke-width: 3;
+      fill: none;
+    }
+
+    .chart-node {
+      position: absolute;
+      width: 10px; height: 10px;
+      background: #fff;
+      border: 2px solid var(--blue-neon);
+      animation: pulsePixel 1.5s infinite steps(2);
+    }
+
+    .stats-pixel-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .stat-pixel-card {
+      background: var(--bg-dark);
+      border: 2px solid var(--border-color);
+      padding: 16px;
+      text-align: center;
+      position: relative;
+      transition: all 0.15s steps(3);
+      cursor: pointer;
+    }
+
+    .stat-pixel-card:hover {
+      transform: translate(-4px, -4px);
+      border-color: var(--blue-neon);
+      box-shadow: 6px 6px 0px var(--blue-neon);
+    }
+
+    .stat-pixel-val {
+      font-family: var(--font-retro);
+      font-size: 1rem;
+      color: var(--green-pixel);
+      margin-bottom: 8px;
+    }
+
+    .stat-pixel-lbl {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    /* ── СТРАНИЦА: СИГНАЛЫ ── */
+    .locked-signals-view {
+      text-align: center;
+      padding: 16px 0;
+    }
+    
+    .lock-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      display: inline-block;
+    }
+
+    .verification-box {
+      max-width: 550px;
+      margin: 0 auto;
+      text-align: left;
+      width: 100%;
+    }
+
+    .step-block {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      padding: 20px 16px 16px 16px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    
+    .step-block.active-step {
+      border-color: var(--blue-neon);
+    }
+
+    .step-num {
+      font-family: var(--font-retro);
+      font-size: 0.65rem;
+      background: var(--blue-neon);
+      color: #000;
+      padding: 4px 8px;
+      position: absolute;
+      top: -14px; left: 14px;
+      box-shadow: 2px 2px 0 #000;
+    }
+
+    .step-text {
+      font-size: 0.9rem;
+      margin-top: 6px;
+      margin-bottom: 12px;
+      font-weight: bold;
+      line-height: 1.4;
+    }
+
+    /* Терминал сигналов */
+    .signals-terminal {
+      background: #02040a;
+      border: 2px solid var(--blue-neon);
+      font-family: var(--font-mono);
+      padding: 16px;
+      box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .terminal-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+
+    .status-indicator { display: flex; align-items: center; gap: 8px; }
+    .status-dot {
+      width: 8px; height: 8px;
+      background: var(--green-pixel);
+      box-shadow: 0 0 8px var(--green-pixel);
+    }
+
+    .signals-log {
+      max-height: 300px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .signal-row {
+      background: var(--bg-panel);
+      border-left: 4px solid var(--blue-neon);
+      padding: 12px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+
+    .signal-direction.call { color: var(--green-pixel); font-weight: bold; }
+    .signal-direction.put { color: var(--red-pixel); font-weight: bold; }
+
+    /* ── СТРАНИЦА: ОБУЧЕНИЕ И О НАС ── */
+    .edu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    
+    .edu-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.15s steps(3);
+      cursor: pointer;
+    }
+
+    .edu-card:hover {
+      transform: translate(-4px, -4px);
+      border-color: var(--blue-neon);
+      box-shadow: 6px 6px 0px var(--blue-neon);
+    }
+
+    .step-badge {
+      font-family: var(--font-retro);
+      font-size: 0.6rem;
+      background: var(--blue-neon);
+      color: #000;
+      padding: 4px 8px;
+      display: inline-block;
+      margin-bottom: 14px;
+      align-self: flex-start;
+      box-shadow: 2px 2px 0px #000;
+    }
+    .edu-card-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--blue-neon);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .edu-list {
+      list-style: none;
+      margin-top: auto;
+      padding-top: 10px;
+    }
+    .edu-list li {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    /* Блок медиа ссылок */
+    .social-links-flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .social-links-flex .btn-pixel {
+      flex: 1 1 calc(50% - 12px);
+      min-width: 140px;
+    }
+
+    /* ── МОДАЛЬНЫЕ ОКНА ── */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(4, 8, 17, 0.85);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-box {
+      background: var(--bg-panel);
+      border: 4px solid var(--blue-neon);
+      box-shadow: 8px 8px 0px #000;
+      width: 100%; max-width: 400px;
+      padding: 24px; position: relative;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: transparent; border: none;
+      color: var(--text-muted); font-family: var(--font-retro);
+      cursor: pointer;
+      padding: 4px;
+    }
+    .close-modal:hover { color: var(--red-pixel); }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 0.8rem; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; }
+    .form-input { width: 100%; background: var(--bg-dark); border: 2px solid var(--border-color); padding: 10px 12px; color: #fff; font-family: var(--font-mono); outline: none; font-size: 0.95rem; }
+    .form-input:focus { border-color: var(--blue-neon); }
+    .error-msg { color: var(--red-pixel); font-size: 0.8rem; margin-top: 5px; display: none; line-height: 1.4; }
+
+    /* ПОДВАЛ */
+    .footer {
+      background: var(--bg-panel); border-top: 2px solid var(--border-color);
+      text-align: center; padding: 24px 16px; font-size: 0.8rem; color: var(--text-muted); margin-top: auto;
+      line-height: 1.5;
+    }
+    .footer-socials {
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       МЕДИА-ЗАПРОСЫ ДЛЯ АДАПТИВНОСТИ
+       ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 960px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      .header {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        padding: 16px;
+      }
+      .logo {
+        justify-content: center;
+      }
+      .nav {
+        justify-content: center;
+        width: 100%;
+      }
+      .nav-btn {
+        flex: 1 1 auto;
+        font-size: 0.8rem;
+        padding: 8px 6px;
+        text-align: center;
+      }
+      .auth-actions, .user-profile-info {
+        justify-content: center;
+        width: 100%;
+      }
+      .auth-actions .btn-pixel, .user-profile-info .btn-pixel {
+        flex: 1 1 auto;
+      }
+      .stats-pixel-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .pixel-panel {
+        padding: 20px 16px;
+      }
+      .hero-title {
+        font-size: 1.15rem;
+        text-align: center;
+      }
+      .hero-grid p {
+        text-align: center;
+      }
+      .hero-grid div:first-child {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .signal-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .signal-row div:last-child {
+        align-self: flex-end;
+      }
+      .social-links-flex {
+        flex-direction: column;
+      }
+      .social-links-flex .btn-pixel {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .nav-btn {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="pixelCanvas"></canvas>
+
+  <header class="header">
+    <a href="#" class="logo" onclick="switchTab('home')">
+      <div class="logo-box"></div>
+      <div>CYBER<span>CYCLONE</span></div>
+    </a>
+    
+    <nav class="nav">
+      <button class="nav-btn active" data-lang="nav_home" onclick="switchTab('home', this)">Главная</button>
+      <button class="nav-btn" data-lang="nav_about" onclick="switchTab('about', this)">О нас</button>
+      <button class="nav-btn" id="signalsNavBtn" data-lang="nav_signals" onclick="switchTab('signals', this)">Сигналы</button>
+      <button class="nav-btn" data-lang="nav_education" onclick="switchTab('education', this)">Обучение</button>
+    </nav>
+
+    <div class="auth-actions">
+      <div class="lang-select-wrapper">
+        <select id="langSelector" class="lang-select" onchange="changeLanguage(this.value)">
+          <option value="ru">РУС</option>
+          <option value="uk">УКР</option>
+          <option value="en">ENG</option>
+          <option value="de">DEU</option>
+          <option value="pl">POL</option>
+          <option value="hu">MAG</option>
+        </select>
+      </div>
+
+      <div id="guestBlock" style="display: flex; gap: 12px; width: auto; justify-content: center;">
+        <button class="btn-pixel" data-lang="btn_login" onclick="openModal('loginModal')">Вход</button>
+        <button class="btn-pixel primary" data-lang="btn_reg" onclick="openModal('regModal')">Регистрация</button>
+      </div>
+      <div id="userBlock" class="user-profile-info">
+        <span class="user-email-display" id="userEmailText">user@cyber.io</span>
+        <button class="btn-pixel danger" data-lang="btn_logout" onclick="handleLogout()">Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section id="home" class="tab-content active">
+      <div class="pixel-panel accent hero-grid">
+        <div>
+          <h1 class="hero-title" data-lang="hero_title">Торговля в стиле <span>CYBER CYCLONE</span></h1>
+          <p data-lang="hero_desc">Используйте мощь искусственного интеллекта и передовые алгоритмы для достижения беспрецедентных результатов на финансовых рынках.</p>
+          <button class="btn-pixel primary" data-lang="btn_activate_terminal" onclick="switchTab('signals', document.getElementById('signalsNavBtn'))">Активировать Терминал</button>
+        </div>
+        <div class="mock-chart">
+          <svg class="mock-chart-line">
+            <polyline points="0,200 50,180 100,220 150,130 200,160 250,90 300,140 400,50 500,80" stroke="#3b82f6" stroke-width="4" fill="none" />
+          </svg>
+          <div class="chart-node" style="left: 245px; top: 85px;"></div>
+          <div class="chart-node" style="left: 395px; top: 45px;"></div>
+          <span id="algoStatusText" style="font-family: var(--font-retro); font-size:0.55rem; color: var(--green-pixel); position:absolute; right:12px; top:12px;">▲ ALGO: STABLE</span>
+        </div>
+      </div>
+
+      <div class="stats-pixel-grid">
+        <div class="stat-pixel-card">
+          <div class="stat-pixel-val">$20M+</div>
+          <div class="stat-pixel-lbl" data-lang="stat_volume">Объем торгов</div>
+        </div>
+        <div class="stat-pixel-card">
+          <div class="stat-pixel-val">9600K+</div>
+          <div class="stat-pixel-lbl" data-lang="stat_traders">Трейдеров</div>
+        </div>
+        <div class="stat-pixel-card">
+          <div class="stat-pixel-val">0.001s</div>
+          <div class="stat-pixel-lbl" data-lang="stat_execution">Исполнение</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="tab-content">
+      <div class="pixel-panel accent">
+        <h2 class="panel-title" data-lang="about_title">🕹️ О проекте Cyber Cyclone</h2>
+        <p data-lang="about_desc">Мы строим самую прозрачную и высокотехнологичную экосистему для трейдеров бинарных опционов. Наш ретро-интерфейс скрывает под капотом мощнейшие скрипты предиктивного анализа.</p>
+        
+        <div class="edu-grid" style="margin-top: 24px;">
+          <div class="edu-card">
+            <div class="step-badge">AUDIENCE</div>
+            <p style="font-family: var(--font-retro); font-size: 0.9rem; color: var(--green-pixel); margin-bottom: 6px;">75 000 +</p>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);" data-lang="about_stat_aud">Постоянных участников</p>
+          </div>
+          <div class="edu-card">
+            <div class="step-badge">CONTENT</div>
+            <p style="font-family: var(--font-retro); font-size: 0.9rem; color: var(--blue-neon); margin-bottom: 6px;">500 +</p>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);" data-lang="about_stat_vid">Обучающих видеоматериалов</p>
+          </div>
+          <div class="edu-card">
+            <div class="step-badge">SUPPORT</div>
+            <p style="font-family: var(--font-retro); font-size: 0.9rem; color: #fff; margin-bottom: 6px;">24/7</p>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);" data-lang="about_stat_gen">Генерация сигналов и контента</p>
+          </div>
+        </div>
+
+        <h3 class="panel-title" style="margin-top: 30px; margin-bottom: 10px;" data-lang="about_resources_title">🔗 Наши официальные ресурсы:</h3>
+        <div class="social-links-flex">
+          <a href="https://t.me/AlfaSigBot" target="_blank" class="btn-pixel primary" data-lang="social_bot">🤖 Telegram Бот</a>
+          <a href="https://t.me/+yo75GPfImlBmYWIy" target="_blank" class="btn-pixel" data-lang="social_channel">📢 Telegram Канал</a>
+          <a href="https://www.instagram.com/ivan_tradeg?igsh=MWE0dGhsM3J6a2R3ZA==" target="_blank" class="btn-pixel">📸 Instagram</a>
+          <a href="https://youtube.com/@ivanbanuk1744?si=QKRDOgzLLW9orvan" target="_blank" class="btn-pixel" data-lang="social_youtube">📺 YouTube Канал</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="signals" class="tab-content">
+      
+      <div id="signalsStateGuest" class="pixel-panel" style="border-color: var(--red-pixel);">
+        <div class="locked-signals-view">
+          <div class="lock-icon">🔒</div>
+          <h2 class="panel-title" style="justify-content: center; color: var(--red-pixel);" data-lang="sig_lock_title">Доступ ограничен</h2>
+          <p data-lang="sig_lock_desc">Для просмотра аналитических сигналов необходимо сначала создать аккаунт на нашем сайте.</p>
+          <div style="margin-top: 20px;">
+            <button class="btn-pixel primary" data-lang="btn_reg_site" onclick="openModal('regModal')">Зарегистрироваться на сайте</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="signalsStateVerify" class="pixel-panel" style="border-color: var(--blue-neon); display: none;">
+        <div class="locked-signals-view">
+          <h2 class="panel-title" style="justify-content: center; color: var(--blue-neon); margin-bottom: 10px;" data-lang="verify_title">🛡️ Активация доступа к сигналам</h2>
+          <p style="margin-bottom: 30px; font-size: 0.9rem; color: var(--text-muted);" data-lang="verify_subtitle">Чтобы подключиться к нашему кибер-шлюзу, ваш аккаунт должен быть зарегистрирован у брокера.</p>
+          
+          <div class="verification-box">
+            
+            <div class="step-block active-step">
+              <div class="step-num" data-lang="verify_step_1_badge">ШАГ 1</div>
+              <div class="step-text" data-lang="verify_step_1_text">Зарегистрируйтесь на Pocket Option по нашей официальной ссылке:</div>
+              <a href="https://u3.shortink.io/smart/bchD6iJ1ntLcBY" target="_blank" class="btn-pixel primary" style="width: 100%;" data-lang="btn_register_pocket">ЗАРЕГИСТРИРОВАТЬСЯ НА POCKET OPTION</a>
+            </div>
+
+            <div class="step-block">
+              <div class="step-num" data-lang="verify_step_2_badge">ШАГ 2</div>
+              <div class="step-text" data-lang="verify_step_2_text">Введите ваш личный UID (ID аккаунта Pocket Option) для проверки:</div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <input type="text" id="pocketUidInput" class="form-input" placeholder="Например: 84729402" style="text-align: center; font-size: 1.1rem; letter-spacing: 2px;">
+                <div id="verifyError" class="error-msg" style="text-align: center; margin-top: 8px;" data-lang="verify_error_text">Ошибка: неверный формат UID или аккаунт не найден в реферальной системе!</div>
+              </div>
+            </div>
+
+            <button class="btn-pixel" id="btnVerifyUid" onclick="handleUidVerification()" style="width: 100%; padding: 12px; font-family: var(--font-retro); font-size: 0.8rem;" data-lang="btn_activate_access">[ АКТИВИРОВАТЬ ДОСТУП ]</button>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="signalsStateUnlocked" class="pixel-panel accent" style="display: none;">
+        <h2 class="panel-title" data-lang="terminal_title">📡 Живая лента кибер-сигналов</h2>
+        <div class="signals-terminal">
+          <div class="terminal-header">
+            <div class="status-indicator">
+              <div class="status-dot"></div>
+              <span data-lang="terminal_radar">РАДАР: АКТИВЕН</span>
+            </div>
+            <div id="terminalClock">TIME: --:----</div>
+          </div>
+          
+          <div class="signals-log" id="signalsLogContainer">
+            <div class="signal-row" style="border: none;">
+              <div id="sysConnectText">[СИСТЕМА] Авторизация успешна. Подключение к шлюзу Pocket Option установлено...</div>
+              <div style="color: var(--text-muted);">now</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="education" class="tab-content">
+      <div class="pixel-panel accent">
+        <h2 class="panel-title" data-lang="edu_main_title">📚 РУКОВОДСТВО ТРЕЙДЕРА</h2>
+        <p data-lang="edu_main_desc">Полное интерактивное руководство по использованию платформы Cyber Cyclone для максимизации профита.</p>
+      </div>
+      
+      <div class="edu-grid">
+        <div class="edu-card">
+          <div class="step-badge">01</div>
+          <div class="edu-card-title" data-lang="edu_card1_title">Регистрация и верификация</div>
+          <p data-lang="edu_card1_desc">Создайте аккаунт, подтвердите email и пройдите KYC верификацию для доступа ко всем функциям платформы.</p>
+          <ul class="edu-list">
+            <li data-lang="edu_card1_li1">✅ Быстрая регистрация за 2 минуты</li>
+            <li data-lang="edu_card1_li2">✅ Мгновенная верификация документов</li>
+            <li data-lang="edu_card1_li3">✅ Доступ к демо-счету сразу после регистрации</li>
+          </ul>
+        </div>
+
+        <div class="edu-card">
+          <div class="step-badge">02</div>
+          <div class="edu-card-title" data-lang="edu_card2_title">Освоение терминала</div>
+          <p data-lang="edu_card2_desc">Изучите интерфейс торгового терминала и основные инструменты для комплексного анализа рынка.</p>
+          <ul class="edu-list">
+            <li data-lang="edu_card2_li1">📊 Настройка рабочих пространств</li>
+            <li data-lang="edu_card2_li2">🔧 Добавление технических индикаторов</li>
+            <li data-lang="edu_card2_li3">⚡ Быстрые клавиши для торговли</li>
+          </ul>
+        </div>
+
+        <div class="edu-card">
+          <div class="step-badge">03</div>
+          <div class="edu-card-title" data-lang="edu_card3_title">Торговая стратегия</div>
+          <p data-lang="edu_card3_desc">Разработайте и протестируйте индивидуальную торговую стратегию в безопасной демо-среде.</p>
+          <ul class="edu-list">
+            <li data-lang="edu_card3_li1">🧠 Использование AI-ассистента</li>
+            <li data-lang="edu_card3_li2">📈 Анализ исторических данных</li>
+            <li data-lang="edu_card3_li3">🎯 Оптимизация параметров стратегии</li>
+          </ul>
+        </div>
+
+        <div class="edu-card">
+          <div class="step-badge">04</div>
+          <div class="edu-card-title" data-lang="edu_card4_title">Реальная торговля</div>
+          <p data-lang="edu_card4_desc">Начните торговать с реальными средствами, используя все технологические преимущества платформы.</p>
+          <ul class="edu-list">
+            <li data-lang="edu_card4_li1">💳 Пополнение счета</li>
+            <li data-lang="edu_card4_li2">🛡️ Управление рисками</li>
+            <li data-lang="edu_card4_li3">📱 Мобильная торговля</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="loginModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'loginModal')">
+    <div class="modal-box">
+      <button class="close-modal" onclick="closeModal('loginModal')">X</button>
+      <h3 class="panel-title" data-lang="modal_login_title">🔑 Вход</h3>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-input" required></div>
+        <div class="form-group"><label class="form-label" data-lang="modal_field_pass">Пароль</label><input type="password" id="loginPassword" class="form-input" required><div id="loginError" class="error-msg" data-lang="modal_login_error">Ошибка авторизации.</div></div>
+        <button type="submit" class="btn-pixel primary" style="width: 100%;" data-lang="btn_login_submit">Войти</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="regModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'regModal')">
+    <div class="modal-box">
+      <button class="close-modal" onclick="closeModal('regModal')">X</button>
+      <h3 class="panel-title" data-lang="modal_reg_title">📝 Регистрация</h3>
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input" required></div>
+        <div class="form-group"><label class="form-label" data-lang="modal_field_pass">Пароль</label><input type="password" id="regPassword" class="form-input" required minlength="4"><div id="regError" class="error-msg" data-lang="modal_reg_error">Email занят.</div></div>
+        <button type="submit" class="btn-pixel primary" style="width: 100%;" data-lang="btn_reg_submit">Создать аккаунт</button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-socials">
+      <a href="https://t.me/AlfaSigBot" target="_blank" style="color: var(--blue-neon); text-decoration: none; font-size: 0.8rem; font-weight: bold;" data-lang="footer_bot">[ БОТ ]</a>
+      <a href="https://t.me/+yo75GPfImlBmYWIy" target="_blank" style="color: var(--blue-neon); text-decoration: none; font-size: 0.8rem; font-weight: bold;" data-lang="footer_channel">[ КАНАЛ ]</a>
+      <a href="https://www.instagram.com/ivan_tradeg?igsh=MWE0dGhsM3J6a2R3ZA==" target="_blank" style="color: var(--blue-neon); text-decoration: none; font-size: 0.8rem; font-weight: bold;">[ INSTAGRAM ]</a>
+      <a href="https://youtube.com/@ivanbanuk1744?si=QKRDOgzLLW9orvan" target="_blank" style="color: var(--blue-neon); text-decoration: none; font-size: 0.8rem; font-weight: bold;">[ YOUTUBE ]</a>
+    </div>
+    <div id="footerRightsText">&copy; 2026 Cyber Cyclone Terminal.</div>
+  </footer>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    // МУЛЬТИЯЗЫЧНАЯ ЛОКАЛИЗАЦИЯ (6 ЯЗЫКОВ)
+    // ═══════════════════════════════════════════════════════════
+    const translations = {
+      ru: {
+        nav_home: "Главная", nav_about: "О нас", nav_signals: "Сигналы", nav_education: "Обучение",
+        btn_login: "Вход", btn_reg: "Регистрация", btn_logout: "Выйти", hero_title: "Торговля в стиле <span>CYBER<span>CYCLONE</span></span>",
+        hero_desc: "Используйте мощь искусственного интеллекта и передовые алгоритмы для достижения беспрецедентных результатов на финансовых рынках.",
+        btn_activate_terminal: "Активировать Терминал", stat_volume: "Объем торгов", stat_traders: "Трейдеров", stat_execution: "Исполнение",
+        about_title: "🕹️ О проекте Cyber Cyclone", about_desc: "Мы строим самую прозрачную и высокотехнологичную экосистему для трейдеров бинарных опционов. Наш ретро-интерфейс скрывает под капотом мощнейшие скрипты предиктивного анализа.",
+        about_stat_aud: "Постоянных участников", about_stat_vid: "Обучающих видеоматериалов", about_stat_gen: "Генерация сигналов и контента",
+        about_resources_title: "🔗 Наши официальные ресурсы:", social_bot: "🤖 Telegram Бот", social_channel: "📢 Telegram Канал", social_youtube: "📺 YouTube Канал",
+        sig_lock_title: "Доступ ограничен", sig_lock_desc: "Для просмотра аналитических сигналов необходимо сначала создать аккаунт на нашем сайте.",
+        btn_reg_site: "Зарегистрироваться на сайте", verify_title: "🛡️ Активация доступа к сигналам", verify_subtitle: "Чтобы подключиться к нашему кибер-шлюзу, ваш аккаунт должен быть зарегистрирован у брокера.",
+        verify_step_1_badge: "ШАГ 1", verify_step_1_text: "Зарегистрируйтесь на Pocket Option по нашей официальной ссылке:", btn_register_pocket: "ЗАРЕГИСТРИРОВАТЬСЯ НА POCKET OPTION",
+        verify_step_2_badge: "ШАГ 2", verify_step_2_text: "Введите ваш личный UID (ID аккаунта Pocket Option) для проверки:", verify_error_text: "Ошибка: неверный формат UID или аккаунт не найден в реферальной системе!",
+        btn_activate_access: "[ АКТИВИРОВАТЬ ДОСТУП ]", terminal_title: "📡 Живая лента кибер-сигналов", terminal_radar: "РАДАР: АКТИВЕН",
+        edu_main_title: "📚 РУКОВОДСТВО ТРЕЙДЕРА", edu_main_desc: "Полное интерактивное руководство по использованию платформы Cyber Cyclone для максимизации профита.",
+        edu_card1_title: "Регистрация и верификация", edu_card1_desc: "Создайте аккаунт, подтвердите email и пройдите KYC верификацию для доступа ко всем функциям платформы.",
+        edu_card1_li1: "✅ Быстрая регистрация за 2 минуты", edu_card1_li2: "✅ Мгновенная верификация документов", edu_card1_li3: "✅ Доступ к демо-счету сразу после регистрации",
+        edu_card2_title: "Освоение терминала", edu_card2_desc: "Изучите интерфейс торгового терминала и основные инструменты для комплексного анализа рынка.",
+        edu_card2_li1: "📊 Настройка рабочих пространств", edu_card2_li2: "🔧 Добавление технических индикаторов", edu_card2_li3: "⚡ Быстрые клавиши для торговли",
+        edu_card3_title: "Торговая стратегия", edu_card3_desc: "Разработайте и протестируйте индивидуальную торговую стратегию в безопасной демо-среде.",
+        edu_card3_li1: "🧠 Использование AI-ассистента", edu_card3_li2: "📈 Анализ исторических данных", edu_card3_li3: "🎯 Оптимизация параметров стратегии",
+        edu_card4_title: "Реальная торговля", edu_card4_desc: "Начните торговать с реальными средствами, используя все технологические преимущества платформы.",
+        edu_card4_li1: "💳 Пополнение счета", edu_card4_li2: "🛡️ Управление рисками", edu_card4_li3: "📱 Мобильная торговля",
+        modal_login_title: "🔑 Вход", modal_field_pass: "Пароль", modal_login_error: "Ошибка авторизации.", btn_login_submit: "Войти",
+        modal_reg_title: "📝 Регистрация", modal_reg_error: "Email занят.", btn_reg_submit: "Создать аккаунт",
+        footer_bot: "[ БОТ ]", footer_channel: "[ КАНАЛ ]", algo_status: "▲ ALGO: STABLE", system_connect: "[СИСТЕМА] Авторизация успешна. Подключение к шлюзу Pocket Option установлено...",
+        verify_loading: "[ ПРОВЕРКА UID В БАЗЕ CYBER CYCLONE... ]", rights: "© 2026 Cyber Cyclone Terminal. Все права защищены. ",
+        sig_rec: "Рекомендация"
+      },
+      uk: {
+        nav_home: "Головна", nav_about: "Про нас", nav_signals: "Сигнали", nav_education: "Навчання",
+        btn_login: "Вхід", btn_reg: "Реєстрація", btn_logout: "Вийти", hero_title: "Торгівля в стилі <span>CYBER<span>CYCLONE</span></span>",
+        hero_desc: "Використовуйте потужність штучного інтелекту та передові алгоритми для досягнення безпрецедентних результатів на фінансових ринках.",
+        btn_activate_terminal: "АКТИВУВАТИ ТЕРМІНАЛ", stat_volume: "Обсяг торгів", stat_traders: "Трейдерів", stat_execution: "Виконання",
+        about_title: "🕹️ Про проект Cyber Cyclone", about_desc: "Ми будуємо найпрозорішу та високотехнологічну екосистему для трейдерів бінарних опціонів. Наш ретро-інтерфейс приховує під капотом потужні скрипти предиктивного аналізу.",
+        about_stat_aud: "Постійних учасників", about_stat_vid: "Навчальних відеоматеріалів", about_stat_gen: "Генерація сигналів та контенту",
+        about_resources_title: "🔗 Наші офіційні ресурси:", social_bot: "🤖 Telegram Бот", social_channel: "📢 Telegram Канал", social_youtube: "📺 YouTube Канал",
+        sig_lock_title: "Доступ обмежено", sig_lock_desc: "Для перегляду аналітичних сигналів необхідно спочатку створити акаунт на нашому сайті.",
+        btn_reg_site: "Зареєструватися на сайті", verify_title: "🛡️ Активація доступу до сигналів", verify_subtitle: "Щоб підключитися до нашого кібер-шлюзу, ваш акаунт має бути зареєстрований у брокера.",
+        verify_step_1_badge: "КРОК 1", verify_step_1_text: "Зареєструйтеся на Pocket Option за нашим офіційним посиланням:", btn_register_pocket: "ЗАРЕЄСТРУВАТИСЯ НА POCKET OPTION",
+        verify_step_2_badge: "КРОК 2", verify_step_2_text: "Введіть ваш особистий UID (ID акаунта Pocket Option) для перевірки:", verify_error_text: "Помилка: невірний формат UID або акаунт не знайдено в реферальній системі!",
+        btn_activate_access: "[ АКТИВУВАТИ ДОСТУП ]", terminal_title: "📡 Жива стрічка кібер-сигналів", terminal_radar: "РАДАР: АКТИВНИЙ",
+        edu_main_title: "📚 КЕРІВНИЦТВО ТРЕЙДЕРА", edu_main_desc: "Повне інтерактивне керівництво з використання платформи Cyber Cyclone для максимізації профіту.",
+        edu_card1_title: "Реєстрація та верифікація", edu_card1_desc: "Створіть акаунт, підтвердіть email та пройдіть KYC верифікацію для доступу до всіх функцій платформи.",
+        edu_card1_li1: "✅ Швидка реєстрація за 2 хвилини", edu_card1_li2: "✅ Миттєва верифікація документів", edu_card1_li3: "✅ Доступ до демо-рахунку одразу після реєстрації",
+        edu_card2_title: "Освоєння терміналу", edu_card2_desc: "Вивчіть інтерфейс торгового терміналу та основні інструменти для комплексного аналізу ринку.",
+        edu_card2_li1: "📊 Налаштування робочих просторів", edu_card2_li2: "🔧 Додавання технічних індикаторів", edu_card2_li3: "⚡ Гарячі клавіші для торгівлі",
+        edu_card3_title: "Торгова стратегія", edu_card3_desc: "Розробіть та протестуйте індивідуальну торгову стратегію у безпечному демо-середовищі.",
+        edu_card3_li1: "🧠 Використання AI-асистента", edu_card3_li2: "📈 Аналіз історичних даних", edu_card3_li3: "🎯 Оптимізація параметрів стратегії",
+        edu_card4_title: "Реальна торгівля", edu_card4_desc: "Почніть торгувати з реальними коштами, використовуючи всі технологічні переваги платформи.",
+        edu_card4_li1: "💳 Поповнення рахунку", edu_card4_li2: "🛡️ Управління ризиками", edu_card4_li3: "📱 Мобільна торгівля",
+        modal_login_title: "🔑 Вхід", modal_field_pass: "Пароль", modal_login_error: "Помилка авторизації.", btn_login_submit: "Увійти",
+        modal_reg_title: "📝 Реєстрація", modal_reg_error: "Email зайнятий.", btn_reg_submit: "Створити акаунт",
+        footer_bot: "[ БОТ ]", footer_channel: "[ КАНАЛ ]", algo_status: "▲ ALGO: СТАБІЛЬНИЙ", system_connect: "[СИСТЕМА] Авторизація успішна. Підключення до шлюзу Pocket Option встановлено...",
+        verify_loading: "[ ПЕРЕВІРКА UID В БАЗІ CYBER CYCLONE... ]", rights: "© 2026 Cyber Cyclone Terminal. Всі права захищені.",
+        sig_rec: "Рекомендація"
+      },
+      en: {
+        nav_home: "Home", nav_about: "About", nav_signals: "Signals", nav_education: "Education",
+        btn_login: "Login", btn_reg: "Register", btn_logout: "Logout", hero_title: "Trading in style <span>CYBER<span>CYCLONE</span></span>",
+        hero_desc: "Harness the power of artificial intelligence and advanced algorithms to achieve unprecedented results in financial markets.",
+        btn_activate_terminal: "Activate Terminal", stat_volume: "Trading Volume", stat_traders: "Traders Active", stat_execution: "Execution Speed",
+        about_title: "🕹️ About Cyber Cyclone Project", about_desc: "We build the most transparent and high-tech ecosystem for binary options traders. Our retro interface hides powerful predictive analysis scripts under the hood.",
+        about_stat_aud: "Regular members", about_stat_vid: "Educational videos", about_stat_gen: "Signal & content generation",
+        about_resources_title: "🔗 Our official resources:", social_bot: "🤖 Telegram Bot", social_channel: "📢 Telegram Channel", social_youtube: "📺 YouTube Channel",
+        sig_lock_title: "Access Restricted", sig_lock_desc: "To view analytical signals, you must first create an account on our website.",
+        btn_reg_site: "Register on website", verify_title: "🛡️ Signal Access Activation", verify_subtitle: "To connect to our cyber gateway, your account must be registered under our broker link.",
+        verify_step_1_badge: "STEP 1", verify_step_1_text: "Register on Pocket Option using our official link:", btn_register_pocket: "REGISTER ON POCKET OPTION",
+        verify_step_2_badge: "STEP 2", verify_step_2_text: "Enter your personal UID (Pocket Option account ID) for verification:", verify_error_text: "Error: invalid UID format or account not found in the referral system!",
+        btn_activate_access: "[ ACTIVATE ACCESS ]", terminal_title: "📡 Live Cyber Signals Feed", terminal_radar: "RADAR: ACTIVE",
+        edu_main_title: "📚 TRADER'S GUIDE", edu_main_desc: "Complete interactive guide on using the Cyber Cyclone platform to maximize your profits.",
+        edu_card1_title: "Registration & verification", edu_card1_desc: "Create an account, confirm email and pass KYC verification to access all platform features.",
+        edu_card1_li1: "✅ Fast registration in 2 minutes", edu_card1_li2: "✅ Instant document verification", edu_card1_li3: "✅ Demo account access right after registration",
+        edu_card2_title: "Terminal Mastery", edu_card2_desc: "Study the trading terminal interface and essential tools for comprehensive market analysis.",
+        edu_card2_li1: "📊 Workspace customization", edu_card2_li2: "🔧 Adding technical indicators", edu_card2_li3: "⚡ Hotkeys for high-speed trading",
+        edu_card3_title: "Trading Strategy", edu_card3_desc: "Develop and test your individual trading strategy within a secure demo environment.",
+        edu_card3_li1: "🧠 Utilizing AI Assistant", edu_card3_li2: "📈 Historical data analysis", edu_card3_li3: "🎯 Optimizing strategy parameters",
+        edu_card4_title: "Real Trading", edu_card4_desc: "Start trading with real funds, taking full advantage of the platform's technological edge.",
+        edu_card4_li1: "💳 Account balance funding", edu_card4_li2: "🛡️ Advanced risk management", edu_card4_li3: "📱 Mobile trading interface",
+        modal_login_title: "🔑 Login", modal_field_pass: "Password", modal_login_error: "Authentication failed.", btn_login_submit: "Sign In",
+        modal_reg_title: "📝 Registration", modal_reg_error: "Email already taken.", btn_reg_submit: "Create Account",
+        footer_bot: "[ BOT ]", footer_channel: "[ CHANNEL ]", algo_status: "▲ ALGO: STABLE", system_connect: "[SYSTEM] Authorization successful. Connection to Pocket Option gateway established...",
+        verify_loading: "[ CHECKING UID IN CYBER CYCLONE DATABASE... ]", rights: "© 2026 Cyber Cyclone Terminal. All rights reserved.",
+        sig_rec: "Recommendation"
+      },
+      de: {
+        nav_home: "Startseite", nav_about: "Über uns", nav_signals: "Signale", nav_education: "Ausbildung",
+        btn_login: "Einloggen", btn_reg: "Registrieren", btn_logout: "Ausloggen", hero_title: "Trading mit Stil <span>CYBER<span>CYCLONE</span></span>",
+        hero_desc: "Nutzen Sie die Kraft künstlicher Intelligenz und fortschrittlicher Algorithmen, um beispiellose Ergebnisse auf den Finanzmärkten zu erzielen.",
+        btn_activate_terminal: "Terminal Aktivieren", stat_volume: "Handelsvolumen", stat_traders: "Aktive Trader", stat_execution: "Ausführung",
+        about_title: "🕹️ Über das Cyber Cyclone Projekt", about_desc: "Wir bauen das transparenteste und modernste Ökosystem für Binäre-Optionen-Trader auf. Unsere Retro-Schnittstelle verbirgt leistungsstarke prädiktive Analyseskripte.",
+        about_stat_aud: "Ständige Mitglieder", about_stat_vid: "Lehrmaterialien (Videos)", about_stat_gen: "Signal- und Inhaltsgenerierung",
+        about_resources_title: "🔗 Unsere offiziellen Ressourcen:", social_bot: "🤖 Telegram Bot", social_channel: "📢 Telegram Kanal", social_youtube: "📺 YouTube Kanal",
+        sig_lock_title: "Zugriff eingeschränkt", sig_lock_desc: "Um analytische Signale anzuzeigen, müssen Sie zuerst ein Konto auf unserer Website erstellen.",
+        btn_reg_site: "Auf der Website registrieren", verify_title: "🛡️ Signal-Zugangsaktivierung", verify_subtitle: "Um eine Verbindung zu unserem Cyber-Gateway herzustellen, muss Ihr Konto über unseren Broker-Link registriert sein.",
+        verify_step_1_badge: "SCHRITT 1", verify_step_1_text: "Registrieren Sie sich bei Pocket Option über unseren offiziellen Link:", btn_register_pocket: "BEI POCKET OPTION REGISTRIEREN",
+        verify_step_2_badge: "SCHRITT 2", verify_step_2_text: "Geben Sie Ihre persönliche UID zur Überprüfung ein:", verify_error_text: "Fehler: Ungültiges UID-Format oder Konto nicht im Empfehlungssystem gefunden!",
+        btn_activate_access: "[ ZUGANG AKTIVIEREN ]", terminal_title: "📡 Live-Cyber-Signale-Feed", terminal_radar: "RADAR: AKTIV",
+        edu_main_title: "📚 TRADER-HANDBUCH", edu_main_desc: "Vollständiger interaktiver Leitfaden zur Nutzung der Cyber Cyclone-Plattform zur Maximierung Ihrer Gewinne.",
+        edu_card1_title: "Registrierung & Verifizierung", edu_card1_desc: "Erstellen Sie ein Konto, bestätigen Sie Ihre E-Mail und bestehen Sie die KYC-Verifizierung, um auf alle Funktionen zuzugreifen.",
+        edu_card1_li1: "✅ Schnelle Registrierung в 2 Min.", edu_card1_li2: "✅ Sofortige Dokumentenprüfung", edu_card1_li3: "✅ Demokonto-Zugriff direkt nach Registrierung",
+        edu_card2_title: "Terminal-Beherrschung", edu_card2_desc: "Studieren Sie die Handelsterminal-Schnittstelle und wichtige Werkzeuge für eine umfassende Marktanalyse.",
+        edu_card2_li1: "📊 Anpassung des Arbeitsbereichs", edu_card2_li2: "🔧 Technische Indikatoren hinzufügen", edu_card2_li3: "⚡ Tastenkombinationen für schnellen Handel",
+        edu_card3_title: "Handelsstrategie", edu_card3_desc: "Entwickeln und testen Sie Ihre individuelle Handelsstrategie in einer sicheren Demo-Umgebung.",
+        edu_card3_li1: "🧠 Nutzung des AI-Assistenten", edu_card3_li2: "📈 Analyse historischer Daten", edu_card3_li3: "🎯 Optimierung der Strategieparameter",
+        edu_card4_title: "Realer Handel", edu_card4_desc: "Beginnen Sie mit dem Handel mit realen Geldern и nutzen Sie den technologischen Vorsprung der Plattform.",
+        edu_card4_li1: "💳 Kontोगуthaben aufladen", edu_card4_li2: "🛡️ Risikomanagement-Tools", edu_card4_li3: "📱 Mobile Handels-App",
+        modal_login_title: "🔑 Login", modal_field_pass: "Passwort", modal_login_error: "Authentifizierung fehlgeschlagen.", btn_login_submit: "Einloggen",
+        modal_reg_title: "📝 Registrierung", modal_reg_error: "E-Mail bereits vergeben.", btn_reg_submit: "Konto erstellen",
+        footer_bot: "[ BOT ]", footer_channel: "[ KANAL ]", algo_status: "▲ ALGO: STABIL", system_connect: "[SYSTEM] Autorisierung erfolgreich. Verbindung zum Pocket Option Gateway hergestellt...",
+        verify_loading: "[ PRÜFUNG DER UID IN DER CYBER CYCLONE DATENBANK... ]", rights: "© 2026 Cyber Cyclone Terminal. Alle Rechte vorbehalten. ",
+        sig_rec: "Empfehlung"
+      },
+      pl: {
+        nav_home: "Główna", nav_about: "O nas", nav_signals: "Sygnały", nav_education: "Edukacja",
+        btn_login: "Zaloguj", btn_reg: "Rejestracja", btn_logout: "Wyloguj", hero_title: "Handel w stylu <span>CYBER<span>CYCLONE</span></span>",
+        hero_desc: "Wykorzystaj moc sztucznej inteligencji i zaawansowanych algorytmów, aby osiągnąć bezprecedensowe wyniki на rynkach finansowych.",
+        btn_activate_terminal: "Aktywuj Terminal", stat_volume: "Obrót handlowy", stat_traders: "Aktywnych traderów", stat_execution: "Egzekucja",
+        about_title: "🕹️ O projekcie Cyber Cyclone", about_desc: "Budujemy najbardziej przejrzysty i zaawansowany technologicznie ekosystem dla traderów opcji binarnych. Nasz retro interfejs kryje pod maską potężne skrypty analizy predykcyjnej.",
+        about_stat_aud: "Stałych członków", about_stat_vid: "Materiałów wideo", about_stat_gen: "Generowanie sygnałów i treści",
+        about_resources_title: "🔗 Nasze oficjalne zasoby:", social_bot: "🤖 Telegram Bot", social_channel: "📢 Telegram Kanał", social_youtube: "📺 YouTube Kanał",
+        sig_lock_title: "Dostęp ograniczony", sig_lock_desc: "Aby przeglądać sygnały analityczne, musisz najpierw utworzyć konto na naszej stronie.",
+        btn_reg_site: "Zarejestruj się na stronie", verify_title: "🛡️ Aktywacja dostępu do sygnałów", verify_subtitle: "Aby połączyć się z naszą cyberbramą, Twoje konto musi być zarejestrowane za pośrednictwem naszego linku brokera.",
+        verify_step_1_badge: "KROK 1", verify_step_1_text: "Zarejestruj się na Pocket Option za pomocą naszego oficjalnego linku:", btn_register_pocket: "ZAREJESTRUJ SIĘ NA POCKET OPTION",
+        verify_step_2_badge: "KROK 2", verify_step_2_text: "Wprowadź swój osobisty UID w celu weryfikacji:", verify_error_text: "Błąd: nieprawidłowy format UID lub nie znaleziono konta w systemie poleceń!",
+        btn_activate_access: "[ AKTYWUJ DOSTĘP ]", terminal_title: "📡 Kanał sygnałów Cyber na żywo", terminal_radar: "RADAR: AKTYWNY",
+        edu_main_title: "📚 PRZEWODNIK TRADERA", edu_main_desc: "Kompletny interaktywny przewodnik dotyczący korzystania z platformy Cyber Cyclone w celu maksymalizacji zysków.",
+        edu_card1_title: "Rejestracja i weryfikacja", edu_card1_desc: "Utwórz konto, potwierdź e-mail i przejdź weryfikację KYC, aby uzyskać dostęp do wszystkich funkcji platformy.",
+        edu_card1_li1: "✅ Szybka rejestracja w 2 minuty", edu_card1_li2: "✅ Natychmiastowa weryfikacja dokumentów", edu_card1_li3: "✅ Dostęp do konta demo natychmiast po rejestracji",
+        edu_card2_title: "Opanowanie terminala", edu_card2_desc: "Zapoznaj się z interfejsem terminala handlowego i podstawowymi narzędziami do kompleksowej analizy rynku.",
+        edu_card2_li1: "📊 Dostosowywanie przestrzeni roboczej", edu_card2_li2: "🔧 Dodawanie wskaźników technicznych", edu_card2_li3: "⚡ Skróty klawiszowe do szybkiego handlu",
+        edu_card3_title: "Strategia handlowa", edu_card3_desc: "Opracuj i przetestuj swoją indywidualną strategię handlową w bezpiecznym środowisku demo.",
+        edu_card3_li1: "🧠 Korzystanie z asystenta AI", edu_card3_li2: "📈 Analiza danych historycznych", edu_card3_li3: "🎯 Optymalizacja parametrów strategii",
+        edu_card4_title: "Prawdziwy handel", edu_card4_desc: "Zacznij handlować prawdziwymi środkami, w pełni wykorzystując przewagę technologiczną platformy.",
+        edu_card4_li1: "💳 Zasilanie salda konta", edu_card4_li2: "🛡️ Zarządzanie ryzykiem", edu_card4_li3: "📱 Mobilna platforma handlowa",
+        modal_login_title: "🔑 Logowanie", modal_field_pass: "Hasło", modal_login_error: "Błąd autoryzacji.", btn_login_submit: "Zaloguj",
+        modal_reg_title: "📝 Rejestracja", modal_reg_error: "Email jest вже zajęty.", btn_reg_submit: "Utwórz konto",
+        footer_bot: "[ BOT ]", footer_channel: "[ KANAŁ ]", algo_status: "▲ ALGO: STABILNY", system_connect: "[SYSTEM] Autoryzacja pomyślna. Połączenie z bramą Pocket Option ustanowione...",
+        verify_loading: "[ SPRAWDZANIE UID W BAZIE DANYCH CYBER CYCLONE... ]", rights: "© 2026 Cyber Cyclone Terminal. Wszelkie prawa zastrzeżone. ",
+        sig_rec: "Rekomendacja"
+      },
+      hu: {
+        nav_home: "Főoldal", nav_about: "Rólunk", nav_signals: "Jelek", nav_education: "Oktatás",
+        btn_login: "Belépés", btn_reg: "Regisztráció", btn_logout: "Kijelentkezés", hero_title: "Kereskedés stílusosan <span>CYBER<span>CYCLONE</span></span>",
+        hero_desc: "Használja ki a mesterséges intelligencia és a fejlett algoritmusok erejét, hogy példátlan eredményeket érjen el a pénzügyi piacokon.",
+        btn_activate_terminal: "Terminál Aktiválása", stat_volume: "Kereskedési volumen", stat_traders: "Aktív kereskedők", stat_execution: "Végrehajtás",
+        about_title: "🕹️ A Cyber Cyclone projektről", about_desc: "A legátláthatóbb és legfejlettebb ökoszisztémát építjük a bináris opciós kereskedők számára. Retro felületünk erőteljes prediktív elemző szkripteket rejt a kapucni alatt.",
+        about_stat_aud: "Állandó tagok száma", about_stat_vid: "Oktató videó anyagok", about_stat_gen: "Jel- és tartalomgenerálás",
+        about_resources_title: "🔗 Hivatalos forrásaink:", social_bot: "🤖 Telegram Bot", social_channel: "📢 Telegram Csatorna", social_youtube: "📺 YouTube Csatorna",
+        sig_lock_title: "Hozzáférés korlátozva", sig_lock_desc: "Az elemzési jelek megtekintéséhez először fiókot kell létrehoznia a weboldalunkon.",
+        btn_reg_site: "Regisztráció az oldalon", verify_title: "🛡️ Jel-hozzáférés aktiválása", verify_subtitle: "A cyber-átjárónkhoz való csatlakozáshoz fiókját a bróker linkünk alatt kell regisztrálni.",
+        verify_step_1_badge: "1. LÉPÉS", verify_step_1_text: "Regisztráljon a Pocket Option-on a hivatalos linkünk segítségével:", btn_register_pocket: "REGISZTRÁCIÓ A POCKET OPTION-ON",
+        verify_step_2_badge: "2. LÉPÉS", verify_step_2_text: "Adja meg személyes UID-jét az ellenőrzéshez:", verify_error_text: "Hiba: érvénytelen UID formátum vagy a fiók nem található az ajánlórendszerben!",
+        btn_activate_access: "[ HOZZÁFÉRÉS AKTIVÁLÁSA ]", terminal_title: "📡 Élő Cyber jelek hírfolyama", terminal_radar: "RADAR: AKTÍV",
+        edu_main_title: "📚 KERESKEDŐI ÚTMUTATÓ", edu_main_desc: "Teljes interaktív útmutató a Cyber Cyclone platform használatához a profit maximalizálása érdekében.",
+        edu_card1_title: "Regisztráció és ellenőrzés", edu_card1_desc: "Hozzon létre egy fiókot, erősítse meg az e-mail címét, és feleljen meg a KYC ellenőrzésnek a funkciók eléréséhez.",
+        edu_card1_li1: "✅ Gyors regisztráció 2 perc alatt", edu_card1_li2: "✅ Azonnali dokumentum-ellenőrzés", edu_card1_li3: "✅ Demó számla hozzáférés a regisztráció után azonnal",
+        edu_card2_title: "Terminál elsajátítása", edu_card2_desc: "Tanulmányozza a kereskedési terminál felületét és a piac átfogó elemzéséhez szükséges alapvető eszközöket.",
+        edu_card2_li1: "📊 Munkaterület testreszabása", edu_card2_li2: "🔧 Technikai indikátorok hozzáadása", edu_card2_li3: "⚡ Gyorsbillentyűk a nagy sebességű kereskedéshez",
+        edu_card3_title: "Kereskedési stratégia", edu_card3_desc: "Dolgozza ki és tesztelje egyéni kereskedési stratégiáját egy biztonságos demó környezetben.",
+        edu_card3_li1: "🧠 AI asszisztens használata", edu_card3_li2: "📈 Előzményadatok elemzése", edu_card3_li3: "🎯 Stratégia paramétereinek optimalizálása",
+        edu_card4_title: "Valódi kereskedés", edu_card4_desc: "Kezdjen el kereskedni valódi pénzzel, kihasználva a platform technológiai előnyeit.",
+        edu_card4_li1: "💳 Számlaegyenleg feltöltése", edu_card4_li2: "🛡️ Kockázatkezelési eszközök", edu_card4_li3: "📱 Mobil kereskedési felület",
+        modal_login_title: "🔑 Belépés", modal_field_pass: "Jelszó", modal_login_error: "Sikertelen azonosítás.", btn_login_submit: "Belépés",
+        modal_reg_title: "📝 Regisztráció", modal_reg_error: "Az e-mail cím már foglalt.", btn_reg_submit: "Fiók létrehozása",
+        footer_bot: "[ BOT ]", footer_channel: "[ CSATORNA ]", algo_status: "▲ ALGO: STABIL", system_connect: "[RENDSZER] Azonosítás sikeres. Kapcsolat a Pocket Option átjáróval létrejött...",
+        verify_loading: "[ UID ELLENŐRZÉSE A CYBER CYCLONE ADATBÁZISBAN... ]", rights: "© 2026 Cyber Cyclone Terminal. Minden jog fenntartva. ",
+        sig_rec: "Ajánlás"
+      }
+    };
+
+    let currentLang = localStorage.getItem('siteLang') || 'ru';
+
+    function changeLanguage(lang) {
+      if (!translations[lang]) return;
+      currentLang = lang;
+      localStorage.setItem('siteLang', lang);
+      document.getElementById('langSelector').value = lang;
+
+      // Обновляем все элементы с атрибутом data-lang
+      const elements = document.querySelectorAll('[data-lang]');
+      elements.forEach(el => {
+        const key = el.getAttribute('data-lang');
+        if (translations[lang][key]) {
+          // Если это заголовок с тегом span, вставляем как HTML
+          if (key === 'hero_title') {
+            el.innerHTML = translations[lang][key];
+          } else {
+            el.textContent = translations[lang][key];
+          }
+        }
+      });
+
+      // Отдельные статичные элементы
+      document.getElementById('algoStatusText').textContent = translations[lang]['algo_status'];
+      document.getElementById('sysConnectText').textContent = translations[lang]['system_connect'];
+      document.getElementById('footerRightsText').innerHTML = translations[lang]['rights'];
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // СОСТОЯНИЕ И UI АВТОРИЗАЦИИ / АКТИВАЦИИ
+    // ═══════════════════════════════════════════════════════════
+    let currentUser = localStorage.getItem('currentUser') || null;
+
+    function getPocketStatus() {
+      if (!currentUser) return false;
+      let activatedUsers = JSON.parse(localStorage.getItem('pixelActivatedUsers')) || {};
+      return !!activatedUsers[currentUser];
+    }
+
+    function updateAuthUI() {
+      const guestBlock = document.getElementById('guestBlock');
+      const userBlock = document.getElementById('userBlock');
+      const userEmailText = document.getElementById('userEmailText');
+      
+      const stateGuest = document.getElementById('signalsStateGuest');
+      const stateVerify = document.getElementById('signalsStateVerify');
+      const stateUnlocked = document.getElementById('signalsStateUnlocked');
+
+      if (currentUser) {
+        guestBlock.style.display = 'none';
+        userBlock.style.display = 'flex';
+        userEmailText.textContent = currentUser;
+
+        if (getPocketStatus()) {
+          stateGuest.style.display = 'none';
+          stateVerify.style.display = 'none';
+          stateUnlocked.style.display = 'block';
+          startSignalsGeneration();
+        } else {
+          stateGuest.style.display = 'none';
+          stateVerify.style.display = 'block';
+          stateUnlocked.style.display = 'none';
+          stopSignalsGeneration();
+        }
+      } else {
+        guestBlock.style.display = 'flex';
+        userBlock.style.display = 'none';
+        
+        stateGuest.style.display = 'block';
+        stateVerify.style.display = 'none';
+        stateUnlocked.style.display = 'none';
+        stopSignalsGeneration();
+      }
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const regError = document.getElementById('regError');
+
+      let users = JSON.parse(localStorage.getItem('pixelUsers')) || {};
+      if (users[email]) { regError.style.display = 'block'; return; }
+
+      users[email] = password;
+      localStorage.setItem('pixelUsers', JSON.stringify(users));
+      
+      currentUser = email;
+      localStorage.setItem('currentUser', email);
+      
+      regError.style.display = 'none';
+      e.target.reset();
+      closeModal('regModal');
+      updateAuthUI();
+      switchTab('signals', document.getElementById('signalsNavBtn'));
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const loginError = document.getElementById('loginError');
+
+      let users = JSON.parse(localStorage.getItem('pixelUsers')) || {};
+      if (users[email] && users[email] === password) {
+        currentUser = email;
+        localStorage.setItem('currentUser', email);
+        loginError.style.display = 'none';
+        e.target.reset();
+        closeModal('loginModal');
+        updateAuthUI();
+        switchTab('signals', document.getElementById('signalsNavBtn'));
+      } else {
+        loginError.style.display = 'block';
+      }
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('currentUser');
+      updateAuthUI();
+      switchTab('home', document.querySelector('.nav-btn'));
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // ИМИТАЦИЯ ВЕРИФИКАЦИИ UID С УЧЕТОМ ЯЗЫКА
+    // ═══════════════════════════════════════════════════════════
+    function handleUidVerification() {
+      const uidInput = document.getElementById('pocketUidInput').value.trim();
+      const verifyError = document.getElementById('verifyError');
+      const btn = document.getElementById('btnVerifyUid');
+
+      if (uidInput.length < 5 || isNaN(uidInput)) {
+        verifyError.style.display = 'block';
+        return;
+      }
+
+      verifyError.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = translations[currentLang]['verify_loading'];
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = translations[currentLang]['btn_activate_access'];
+
+        let activatedUsers = JSON.parse(localStorage.getItem('pixelActivatedUsers')) || {};
+        activatedUsers[currentUser] = uidInput;
+        localStorage.setItem('pixelActivatedUsers', JSON.stringify(activatedUsers));
+
+        updateAuthUI();
+      }, 1500);
+    }
+
+    function switchTab(tabId, buttonElement) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      const activeTab = document.getElementById(tabId);
+      if(activeTab) activeTab.classList.add('active');
+
+      if(buttonElement) {
+        const buttons = document.querySelectorAll('.nav-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        buttonElement.classList.add('active');
+      }
+    }
+
+    function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
+    function closeModal(modalId) { 
+      document.getElementById(modalId).classList.remove('active'); 
+      document.getElementById('loginError').style.display = 'none';
+      document.getElementById('regError').style.display = 'none';
+    }
+    function closeModalOnOverlay(e, modalId) { if(e.target.id === modalId) closeModal(modalId); }
+
+    // ═══════════════════════════════════════════════════════════
+    // ГЕНЕРАЦИЯ СИГНАЛОВ
+    // ═══════════════════════════════════════════════════════════
+    let signalsInterval = null;
+    const pairs = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'BTC/USDT'];
+
+    function startSignalsGeneration() {
+      if (signalsInterval) return;
+      signalsInterval = setInterval(() => {
+        const logContainer = document.getElementById('signalsLogContainer');
+        if (!logContainer) return;
+
+        const randomPair = pairs[Math.floor(Math.random() * pairs.length)];
+        const isCall = Math.random() > 0.5;
+        const timeStr = new Date().toTimeString().split(' ')[0];
+
+        const row = document.createElement('div');
+        row.className = 'signal-row';
+        
+        const recText = translations[currentLang]['sig_rec'] || 'Рекомендация';
+        const dirText = isCall ? '▲ CALL ' + (currentLang === 'en' || currentLang === 'de' ? '(Up)' : currentLang === 'pl' ? '(W górę)' : currentLang === 'hu' ? '(Fel)' : '(Вверх)') : '▼ PUT ' + (currentLang === 'en' || currentLang === 'de' ? '(Down)' : currentLang === 'pl' ? '(W dół)' : currentLang === 'hu' ? '(Le)' : '(Вниз)');
+
+        row.innerHTML = `
+          <div>
+            <span style="color: var(--blue-neon); font-weight: bold;">[${randomPair}]</span> &rarr; 
+            ${recText}: <span class="${isCall ? 'signal-direction call' : 'signal-direction put'}">${dirText}</span>
+          </div>
+          <div style="color: var(--text-muted); font-size: 0.8rem;">${timeStr}</div>
+        `;
+        if (logContainer.children.length > 5) logContainer.removeChild(logContainer.children[1]);
+        logContainer.appendChild(row);
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }, 4000);
+    }
+
+    function stopSignalsGeneration() { clearInterval(signalsInterval); signalsInterval = null; }
+
+    setInterval(() => {
+      const clock = document.getElementById('terminalClock');
+      if(clock) clock.textContent = 'TIME: ' + new Date().toTimeString().split(' ')[0];
+    }, 1000);
+
+    // ── ХОЛСТ ПИКСЕЛЕЙ ПОД КУРСОРОМ ──
+    const canvas = document.getElementById('pixelCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+    class PixelParticle {
+      constructor(x, y) {
+        this.x = x; this.y = y;
+        this.size = Math.floor(Math.random() * 4) + 4;
+        this.speedX = (Math.random() * 2 - 1); this.speedY = (Math.random() * 2) + 1;
+        const shades = ['#3b82f6', '#1d4ed8', '#60a5fa', '#2563eb'];
+        this.color = shades[Math.floor(Math.random() * shades.length)];
+        this.alpha = 1; this.decay = Math.random() * 0.02 + 0.01;
+      }
+      update() { this.x += this.speedX; this.y += this.speedY; this.alpha -= this.decay; }
+      draw() {
+        ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color;
+        ctx.fillRect(Math.floor(this.x), Math.floor(this.y), this.size, this.size); ctx.restore();
+      }
+    }
+    window.addEventListener('mousemove', (e) => {
+      for (let i = 0; i < 2; i++) particles.push(new PixelParticle(e.clientX, e.clientY));
+    });
+    
+    window.addEventListener('touchmove', (e) => {
+      if(e.touches.length > 0) {
+        for (let i = 0; i < 2; i++) particles.push(new PixelParticle(e.touches[0].clientX, e.touches[0].clientY));
+      }
+    });
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(); particles[i].draw();
+        if (particles[i].alpha <= 0) { particles.splice(i, 1); i--; }
+      }
+      requestAnimationFrame(animate);
+    }
+    
+    // Инициализация языка и UI при загрузке
+    changeLanguage(currentLang);
+    updateAuthUI();
+    animate();
+  </script>
+</body>
+</html>
