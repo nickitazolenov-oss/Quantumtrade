@@ -53,12 +53,14 @@
       pointer-events: none;
     }
 
-    /* Холст для анимации пикселей под курсором */
+    /* Холст для анимации неоновых пикселей под курсором */
     #pixelCanvas {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none;
       z-index: 9999;
+      /* Добавляем аппаратный фильтр яркости и размытия тени для Canvas */
+      filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6)) drop-shadow(0 0 8px rgba(0, 255, 170, 0.4));
     }
 
     /* ── ШАПКА САЙТА (HEADER) ── */
@@ -135,7 +137,6 @@
       flex-wrap: wrap;
     }
 
-    /* Стильный пиксельный селектор языков */
     .lang-select-wrapper {
       position: relative;
     }
@@ -144,9 +145,9 @@
       border: 2px solid var(--blue-neon);
       color: var(--text-main);
       font-family: var(--font-mono);
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       font-weight: 700;
-      padding: 6px 10px;
+      padding: 4px 8px;
       outline: none;
       cursor: pointer;
       box-shadow: 2px 2px 0px var(--blue-glow);
@@ -159,12 +160,12 @@
     .user-profile-info {
       display: none;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
     .user-email-display {
-      font-size: 0.85rem;
+      font-size: 0.7rem;
       color: var(--blue-neon);
       border-bottom: 1px dashed var(--blue-neon);
       padding-bottom: 2px;
@@ -174,13 +175,13 @@
     .btn-pixel {
       font-family: var(--font-mono);
       font-weight: 700;
-      font-size: 0.85rem;
-      padding: 8px 16px;
+      font-size: 0.7rem;
+      padding: 6px 12px;
       cursor: pointer;
       border: 2px solid var(--blue-neon);
       background: var(--bg-card);
       color: var(--text-main);
-      box-shadow: 3px 3px 0px var(--blue-glow);
+      box-shadow: 2px 2px 0px var(--blue-glow);
       text-decoration: none;
       display: inline-block;
       text-align: center;
@@ -189,7 +190,7 @@
 
     .btn-pixel:hover {
       transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0px var(--blue-neon);
+      box-shadow: 3px 3px 0px var(--blue-neon);
     }
 
     .btn-pixel:active {
@@ -201,23 +202,23 @@
       background: var(--blue-neon);
       border: 2px solid #fff;
       color: #000;
-      box-shadow: 3px 3px 0px var(--bg-card);
+      box-shadow: 2px 2px 0px var(--bg-card);
     }
-    .btn-pixel.primary:hover { box-shadow: 4px 4px 0px #fff; }
+    .btn-pixel.primary:hover { box-shadow: 3px 3px 0px #fff; }
     
     .btn-pixel.danger {
       border-color: var(--red-pixel);
-      box-shadow: 3px 3px 0px rgba(255, 51, 102, 0.4);
+      box-shadow: 2px 2px 0px rgba(255, 51, 102, 0.4);
     }
-    .btn-pixel.danger:hover { box-shadow: 4px 4px 0px var(--red-pixel); }
+    .btn-pixel.danger:hover { box-shadow: 3px 3px 0px var(--red-pixel); }
 
     /* ── КОНТЕНТНЫЕ СЕКЦИИ ── */
     .container {
       flex: 1;
       max-width: 1200px;
       width: 100%;
-      margin: 24px auto;
-      padding: 0 16px;
+      margin: 16px auto;
+      padding: 0 12px;
     }
 
     .tab-content {
@@ -244,6 +245,380 @@
     .pixel-panel.accent {
       border-color: var(--blue-neon);
       box-shadow: 6px 6px 0px var(--blue-glow);
+    }
+
+    /* ── АДАПТИВНОСТЬ: ПЛАНШЕТЫ (768px - 1024px) ── */
+    @media (max-width: 1024px) {
+      .pixel-panel {
+        padding: 18px;
+        box-shadow: 4px 4px 0px #040811;
+        margin-bottom: 18px;
+      }
+
+      .pixel-panel.accent {
+        box-shadow: 4px 4px 0px var(--blue-glow);
+      }
+
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-3col {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* ── АДАПТИВНОСТЬ: МОБИЛЬНЫЕ (до 768px) ── */
+    @media (max-width: 768px) {
+      body {
+        font-size: 14px;
+      }
+
+      /* Фоновая сетка менее видна */
+      body::before {
+        background-image: linear-gradient(rgba(59, 130, 246, 0.01) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(59, 130, 246, 0.01) 1px, transparent 1px);
+        background-size: 30px 30px;
+      }
+
+      /* Шапка */
+      .header {
+        padding: 8px 12px;
+        min-height: 56px;
+        gap: 6px;
+      }
+
+      .logo {
+        font-size: 0.6rem;
+        gap: 6px;
+      }
+
+      .logo-box {
+        width: 18px;
+        height: 18px;
+      }
+
+      .nav {
+        gap: 2px;
+        margin-top: 6px;
+      }
+
+      .nav-btn {
+        font-size: 0.65rem;
+        padding: 3px 6px;
+      }
+
+      .nav-btn.active {
+        box-shadow: 1px 1px 0px var(--blue-glow);
+      }
+
+      .auth-actions {
+        gap: 6px;
+      }
+
+      .lang-select {
+        font-size: 0.65rem;
+        padding: 3px 6px;
+        box-shadow: 1px 1px 0px var(--blue-glow);
+      }
+
+      .btn-pixel {
+        font-size: 0.65rem;
+        padding: 5px 10px;
+        box-shadow: 1px 1px 0px var(--blue-glow);
+      }
+
+      .btn-pixel:hover {
+        box-shadow: 2px 2px 0px var(--blue-neon);
+      }
+
+      .btn-pixel.primary {
+        box-shadow: 1px 1px 0px var(--bg-card);
+      }
+
+      .btn-pixel.primary:hover {
+        box-shadow: 2px 2px 0px #fff;
+      }
+
+      .btn-pixel.danger {
+        box-shadow: 1px 1px 0px rgba(255, 51, 102, 0.4);
+      }
+
+      .btn-pixel.danger:hover {
+        box-shadow: 2px 2px 0px var(--red-pixel);
+      }
+
+      /* Контейнер */
+      .container {
+        margin: 10px auto;
+        padding: 0 10px;
+      }
+
+      /* Панели */
+      .pixel-panel {
+        padding: 14px;
+        border: 2px solid var(--border-color);
+        box-shadow: 3px 3px 0px #040811;
+        margin-bottom: 14px;
+      }
+
+      .pixel-panel.accent {
+        border: 2px solid var(--blue-neon);
+        box-shadow: 3px 3px 0px var(--blue-glow);
+      }
+
+      /* Сетки */
+      .grid-2col,
+      .grid-3col,
+      .card-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      /* Модальные окна */
+      .modal-content {
+        max-width: 90vw;
+        max-height: 90vh;
+        padding: 16px;
+        border: 2px solid var(--blue-neon);
+      }
+
+      .form-group {
+        margin-bottom: 10px;
+      }
+
+      .form-group label {
+        font-size: 0.75rem;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        font-size: 16px; /* Предотвращает зум на iOS */
+        padding: 8px;
+      }
+
+      /* Высокие элементы для сенсорного экрана (минимум 44x44px) */
+      input, textarea, select, button {
+        min-height: 44px;
+      }
+
+      /* Текст */
+      h1 {
+        font-size: 1rem;
+      }
+
+      h2 {
+        font-size: 0.9rem;
+      }
+
+      h3 {
+        font-size: 0.85rem;
+      }
+
+      .pixel-heading-1 {
+        font-size: 0.8rem;
+      }
+
+      .pixel-heading-2 {
+        font-size: 0.75rem;
+      }
+
+      .pixel-heading-3 {
+        font-size: 0.7rem;
+      }
+
+      /* Таблицы */
+      .data-table {
+        font-size: 0.75rem;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 8px 6px;
+      }
+
+      /* Графики */
+      #liveChartContainer {
+        min-height: 200px;
+      }
+
+      /* Сигналы */
+      .signal-row {
+        font-size: 0.7rem;
+        padding: 8px;
+        gap: 8px;
+      }
+
+      .signal-direction {
+        font-size: 0.6rem;
+      }
+
+      /* Информационные блоки */
+      .info-block {
+        padding: 12px;
+        font-size: 0.8rem;
+      }
+
+      /* Убираем теневые эффекты для лучшей производительности */
+      .pixel-panel,
+      .btn-pixel,
+      .lang-select {
+        /* Оставляем основные тени, но уменьшаем */
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Отступы между элементами */
+      .tab-content {
+        animation: pixelateIn 0.2s steps(4);
+      }
+    }
+
+    /* ── АДАПТИВНОСТЬ: ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ (до 480px) ── */
+    @media (max-width: 480px) {
+      /* Шапка */
+      .header {
+        padding: 6px 8px;
+        min-height: 50px;
+      }
+
+      .logo {
+        font-size: 0.55rem;
+        gap: 4px;
+      }
+
+      .logo-box {
+        width: 16px;
+        height: 16px;
+      }
+
+      .nav {
+        gap: 1px;
+      }
+
+      .nav-btn {
+        font-size: 0.6rem;
+        padding: 2px 4px;
+      }
+
+      .auth-actions {
+        gap: 4px;
+      }
+
+      .lang-select {
+        font-size: 0.6rem;
+        padding: 2px 4px;
+      }
+
+      .user-email-display {
+        font-size: 0.6rem;
+      }
+
+      .btn-pixel {
+        font-size: 0.6rem;
+        padding: 4px 8px;
+      }
+
+      /* Контейнер */
+      .container {
+        margin: 8px auto;
+        padding: 0 8px;
+      }
+
+      /* Панели */
+      .pixel-panel {
+        padding: 10px;
+        border: 2px solid var(--border-color);
+        box-shadow: 2px 2px 0px #040811;
+        margin-bottom: 10px;
+      }
+
+      .pixel-panel.accent {
+        box-shadow: 2px 2px 0px var(--blue-glow);
+      }
+
+      /* Текст */
+      h1 {
+        font-size: 0.9rem;
+      }
+
+      h2 {
+        font-size: 0.8rem;
+      }
+
+      h3 {
+        font-size: 0.75rem;
+      }
+
+      .pixel-heading-1 {
+        font-size: 0.75rem;
+      }
+
+      .pixel-heading-2 {
+        font-size: 0.7rem;
+      }
+
+      .pixel-heading-3 {
+        font-size: 0.65rem;
+      }
+
+      /* Графики */
+      #liveChartContainer {
+        min-height: 150px;
+      }
+
+      /* Сигналы */
+      .signal-row {
+        font-size: 0.65rem;
+        padding: 6px;
+      }
+
+      /* Информационные блоки */
+      .info-block {
+        padding: 10px;
+        font-size: 0.75rem;
+      }
+
+      /* Таблицы */
+      .data-table {
+        font-size: 0.7rem;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 6px 4px;
+      }
+
+      /* Тени еще меньше */
+      .pixel-panel,
+      .btn-pixel,
+      .lang-select {
+        box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    /* ── ПЕЙЗАЖНАЯ ОРИЕНТАЦИЯ НА МОБИЛЬНЫХ ── */
+    @media (max-height: 600px) and (orientation: landscape) {
+      .header {
+        min-height: 48px;
+        padding: 6px 10px;
+      }
+
+      .container {
+        margin: 8px auto;
+      }
+
+      .pixel-panel {
+        margin-bottom: 10px;
+        padding: 12px;
+      }
+
+      h1, h2, h3 {
+        margin: 8px 0;
+      }
     }
 
     .panel-title {
@@ -288,20 +663,12 @@
       width: 100%;
     }
     
-    .mock-chart-line {
+    #liveChartCanvas {
       position: absolute;
-      width: 100%; height: 100%;
-      stroke: var(--blue-neon);
-      stroke-width: 3;
-      fill: none;
-    }
-
-    .chart-node {
-      position: absolute;
-      width: 10px; height: 10px;
-      background: #fff;
-      border: 2px solid var(--blue-neon);
-      animation: pulsePixel 1.5s infinite steps(2);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
     }
 
     .stats-pixel-grid {
@@ -512,6 +879,103 @@
       min-width: 140px;
     }
 
+    /* ── СЕКЦИЯ ТОП ТРЕЙДЕРОВ С КРУТОЙ АНИМАЦИЕЙ ── */
+    .traders-showcase {
+      margin-top: 32px;
+      border-top: 2px dashed var(--border-color);
+      padding-top: 28px;
+    }
+
+    .traders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .trader-pixel-card {
+      background: var(--bg-dark);
+      border: 3px solid var(--border-color);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .trader-pixel-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--green-pixel);
+      box-shadow: 0 0 15px rgba(0, 255, 170, 0.3), 5px 5px 0px var(--blue-neon);
+    }
+
+    .trader-avatar-box {
+      width: 60px; height: 60px;
+      background: var(--bg-panel);
+      border: 2px solid var(--blue-neon);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-retro);
+      font-size: 1.2rem;
+      color: var(--text-main);
+      box-shadow: 3px 3px 0px #000;
+      transition: transform 0.2s steps(2);
+    }
+
+    .trader-pixel-card:hover .trader-avatar-box {
+      transform: scale(1.1) rotate(4deg);
+      border-color: var(--green-pixel);
+    }
+
+    .trader-name {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .trader-status {
+      font-size: 0.7rem;
+      font-family: var(--font-retro);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-pulse-dot {
+      width: 6px; height: 6px;
+      background-color: var(--green-pixel);
+      border-radius: 50%;
+      animation: blinkPulse 1s infinite alternate;
+    }
+
+    @keyframes blinkPulse {
+      from { opacity: 0.3; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px var(--green-pixel); }
+    }
+
+    .trader-stat-line {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .trader-stat-line:last-of-type { border-bottom: none; }
+    .trader-lbl { color: var(--text-muted); }
+    .trader-val { font-weight: bold; }
+    .trader-val.winrate { color: var(--green-pixel); font-family: var(--font-retro); font-size: 0.75rem; }
+    .trader-val.profit { color: #fff; }
+
     /* ── МОДАЛЬНЫЕ ОКНА ── */
     .modal-overlay {
       position: fixed;
@@ -566,130 +1030,30 @@
       flex-wrap: wrap;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       ОБНОВЛЕННЫЕ АДАПТИВНЫЕ МЕДИА-ЗАПРОСЫ (КРАСИВАЯ МОБИЛЬНАЯ ВЕРСТКА)
-       ═══════════════════════════════════════════════════════════ */
+    /* АДАПТИВНОСТЬ */
     @media (max-width: 960px) {
-      .hero-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-      }
+      .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+      .header { padding: 16px; }
     }
-
-    /* Смартфоны и Планшеты */
-    @media (max-width: 768px) {
-      .header {
-        padding: 10px 16px;
-        gap: 12px;
-        justify-content: center; /* Центрируем контент хедера на мобильных */
-      }
-      .logo {
-        width: 100%;
-        justify-content: center;
-        margin-bottom: 2px;
-      }
-      .nav {
-        justify-content: center;
-        width: 100%;
-        background: var(--bg-dark); /* Делаем меню в виде красивого ретро-блока */
-        padding: 4px;
-        border: 2px solid var(--border-color);
-        box-shadow: 2px 2px 0px #000;
-      }
-      .nav-btn {
-        flex: 1 1 auto;
-        font-size: 0.75rem;
-        padding: 8px 4px;
-        text-align: center;
-        box-shadow: none !important;
-        background: transparent !important;
-        border: none !important;
-      }
-      .nav-btn.active {
-        color: var(--blue-neon);
-        font-weight: bold;
-        border-bottom: 3px solid var(--blue-neon) !important;
-      }
-      .auth-actions {
-        width: 100%;
-        justify-content: center;
-        gap: 8px;
-        margin-top: 4px;
-      }
-      .lang-select {
-        font-size: 0.8rem;
-        padding: 5px 8px;
-      }
-      .auth-actions .btn-pixel, .user-profile-info .btn-pixel {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-        flex: 1 1 auto;
-      }
-      .container {
-        margin: 12px auto; /* Уменьшаем отступ сверху, чтобы контент не улетал вниз */
-      }
-      .stats-pixel-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-      .pixel-panel {
-        padding: 16px;
-      }
-      .hero-title {
-        font-size: 1.1rem;
-        text-align: center;
-      }
-      .hero-grid p {
-        text-align: center;
-        font-size: 0.85rem;
-      }
-      .hero-grid div:first-child {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .signal-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-      .signal-row div:last-child {
-        align-self: flex-end;
-      }
-      .social-links-flex {
-        flex-direction: column;
-      }
-      .social-links-flex .btn-pixel {
-        width: 100%;
-      }
+    @media (max-width: 640px) {
+      .header { flex-direction: column; align-items: stretch; text-align: center; padding: 16px; }
+      .logo { justify-content: center; }
+      .nav { justify-content: center; width: 100%; }
+      .nav-btn { flex: 1 1 auto; font-size: 0.8rem; padding: 8px 6px; text-align: center; }
+      .auth-actions, .user-profile-info { justify-content: center; width: 100%; }
+      .auth-actions .btn-pixel, .user-profile-info .btn-pixel { flex: 1 1 auto; }
+      .stats-pixel-grid { grid-template-columns: 1fr; gap: 12px; }
+      .pixel-panel { padding: 20px 16px; }
+      .hero-title { font-size: 1.15rem; text-align: center; }
+      .hero-grid p { text-align: center; }
+      .hero-grid div:first-child { display: flex; flex-direction: column; align-items: center; }
+      .signal-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .signal-row div:last-child { align-self: flex-end; }
+      .social-links-flex { flex-direction: column; }
+      .social-links-flex .btn-pixel { width: 100%; }
     }
-
-    /* Очень маленькие экраны телефонов */
-    @media (max-width: 480px) {
-      .logo {
-        font-size: 0.75rem;
-      }
-      .logo-box {
-        width: 20px; height: 20px;
-      }
-      .nav-btn {
-        font-size: 0.65rem;
-        padding: 6px 2px;
-      }
-      .auth-actions {
-        flex-direction: row;
-        width: 100%;
-      }
-      .user-profile-info {
-        width: 100%;
-        justify-content: center;
-      }
-      .user-email-display {
-        font-size: 0.75rem;
-        width: 100%;
-        text-align: center;
-        margin-bottom: 4px;
-      }
+    @media (max-width: 360px) {
+      .nav-btn { font-size: 0.75rem; }
     }
   </style>
 </head>
@@ -722,7 +1086,7 @@
         </select>
       </div>
 
-      <div id="guestBlock" style="display: flex; gap: 12px; align-items: center;">
+      <div id="guestBlock" style="display: flex; gap: 12px; width: auto; justify-content: center;">
         <button class="btn-pixel" data-lang="btn_login" onclick="openModal('loginModal')">Вход</button>
         <button class="btn-pixel primary" data-lang="btn_reg" onclick="openModal('regModal')">Регистрация</button>
       </div>
@@ -743,12 +1107,8 @@
           <button class="btn-pixel primary" data-lang="btn_activate_terminal" onclick="switchTab('signals', document.getElementById('signalsNavBtn'))">Активировать Терминал</button>
         </div>
         <div class="mock-chart">
-          <svg class="mock-chart-line">
-            <polyline points="0,200 50,180 100,220 150,130 200,160 250,90 300,140 400,50 500,80" stroke="#3b82f6" stroke-width="4" fill="none" />
-          </svg>
-          <div class="chart-node" style="left: 245px; top: 85px;"></div>
-          <div class="chart-node" style="left: 395px; top: 45px;"></div>
-          <span id="algoStatusText" style="font-family: var(--font-retro); font-size:0.55rem; color: var(--green-pixel); position:absolute; right:12px; top:12px;">▲ ALGO: STABLE</span>
+          <canvas id="liveChartCanvas"></canvas>
+          <span id="algoStatusText" style="font-family: var(--font-retro); font-size:0.55rem; color: var(--green-pixel); position:absolute; right:12px; top:12px; z-index: 10;">▲ ALGO: STABLE</span>
         </div>
       </div>
 
@@ -764,6 +1124,27 @@
         <div class="stat-pixel-card">
           <div class="stat-pixel-val">0.001s</div>
           <div class="stat-pixel-lbl" data-lang="stat_execution">Исполнение</div>
+        </div>
+      </div>
+
+      <div class="pixel-panel" style="margin-top: 24px;">
+        <h3 class="panel-title" data-lang="home_benefits_title">🎯 ПОЧЕМУ ИМЕННО МЫ?</h3>
+        <div class="edu-grid">
+          <div class="edu-card">
+            <div class="step-badge">AI ANALYTICS</div>
+            <div class="edu-card-title" data-lang="home_b1_title">Нейросетевой анализ</div>
+            <p style="font-size: 0.85rem; margin: 0;" data-lang="home_b1_desc">Наши скрипты непрерывно сканируют более 40 валютных пар, выявляя скрытые паттерны крупных игроков рынков.</p>
+          </div>
+          <div class="edu-card">
+            <div class="step-badge">SECURITY</div>
+            <div class="edu-card-title" data-lang="home_b2_title">Абсолютная безопасность</div>
+            <p style="font-size: 0.85rem; margin: 0;" data-lang="home_b2_desc">Ваш сквозной UID брокера используется только для автоматической синхронизации и валидации вашего статуса доступа.</p>
+          </div>
+          <div class="edu-card">
+            <div class="step-badge">ADAPTIVITY</div>
+            <div class="edu-card-title" data-lang="home_b3_title">Рыночная адаптивность</div>
+            <p style="font-size: 0.85rem; margin: 0;" data-lang="home_b3_desc">Алгоритм подстраивается под волатильность рынка (OTC и биржевые сессии) в режиме реального времени.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -791,7 +1172,77 @@
           </div>
         </div>
 
-        <h3 class="panel-title" style="margin-top: 30px; margin-bottom: 10px;" data-lang="about_resources_title">🔗 Наши официальные ресурсы:</h3>
+        <div class="traders-showcase">
+          <h3 class="panel-title" data-lang="traders_title">⚡ КИБЕР-ТРЕЙДЕРЫ ЭКОСИСТЕМЫ</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" data-lang="traders_subtitle">Участники нашего комьюнити, которые используют алгоритмы Cyber Cyclone на полную мощность и демонстрируют стабильный профит.</p>
+          
+          <div class="traders-grid">
+            <div class="trader-pixel-card">
+              <div class="trader-avatar-box">N_1</div>
+              <div class="trader-name">Neo_Scalper</div>
+              <div class="trader-status">
+                <div class="status-pulse-dot"></div>
+                <span style="color: var(--green-pixel);">ONLINE</span>
+              </div>
+              <div class="trader-stat-line">
+                <span class="trader-lbl" data-lang="trader_winrate">Успешные сделки</span>
+                <span class="trader-val winrate">89.4%</span>
+              </div>
+              <div class="trader-stat-line">
+                <span class="trader-lbl" data-lang="trader_profit">Прибыль (мес)</span>
+                <span class="trader-val profit">+$14,230</span>
+              </div>
+              <div class="trader-stat-line">
+                <span class="trader-lbl" data-lang="trader_asset">Любимая пара</span>
+                <span class="trader-val" style="color: var(--blue-neon);">EUR/USD OTC</span>
+              </div>
+            </div>
+
+            <div class="trader-pixel-card">
+              <div class="trader-avatar-box">M_X</div>
+              <div class="trader-name">Matrix_Lord</div>
+              <div class="trader-status">
+                <div class="status-pulse-dot" style="background-color: #3b82f6;"></div>
+                <span style="color: var(--blue-neon);" data-lang="trader_status_trading">TRADING</span>
+              </div>
+              <div class="trader-stat-line">
+                <span class="trader-lbl" data-lang="trader_winrate">Успешные сделки</span>
+                <span class="trader-val winrate">86.1%</span>
+              </div>
+              <div class="trader-stat-line">
+                <span class="trader-lbl" data-lang="trader_profit">Прибыль (мес)</span>
+                <span class="trader-val profit">+$9,850</span>
+              </div>
+              <div class="trader-stat-line">
+                <span class="trader-lbl" data-lang="trader_asset">Любимая пара</span>
+                <span class="trader-val" style="color: var(--blue-neon);">GBP/USD</span>
+              </div>
+            </div>
+
+            <div class="trader-pixel-card">
+              <div class="trader-avatar-box">C_Q</div>
+              <div class="trader-name">CryptoQueen</div>
+              <div class="trader-status">
+                <div class="status-pulse-dot"></div>
+                <span style="color: var(--green-pixel);">ONLINE</span>
+              </div>
+              <div class="trader-stat-line">
+                <span class="trader-lbl" data-lang="trader_winrate">Успешные сделки</span>
+                <span class="trader-val winrate">91.2%</span>
+              </div>
+              <div class="trader-stat-line">
+                <span class="trader-lbl" data-lang="trader_profit">Прибыль (мес)</span>
+                <span class="trader-val profit">+$22,400</span>
+              </div>
+              <div class="trader-stat-line">
+                <span class="trader-lbl" data-lang="trader_asset">Любимая пара</span>
+                <span class="trader-val" style="color: var(--blue-neon);">Crypto IDX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="panel-title" style="margin-top: 36px; margin-bottom: 10px;" data-lang="about_resources_title">🔗 Наши официальные ресурсы:</h3>
         <div class="social-links-flex">
           <a href="https://t.me/AlfaSigBot" target="_blank" class="btn-pixel primary" data-lang="social_bot">🤖 Telegram Бот</a>
           <a href="https://t.me/+yo75GPfImlBmYWIy" target="_blank" class="btn-pixel" data-lang="social_channel">📢 Telegram Канал</a>
@@ -802,7 +1253,6 @@
     </section>
 
     <section id="signals" class="tab-content">
-      
       <div id="signalsStateGuest" class="pixel-panel" style="border-color: var(--red-pixel);">
         <div class="locked-signals-view">
           <div class="lock-icon">🔒</div>
@@ -820,7 +1270,6 @@
           <p style="margin-bottom: 30px; font-size: 0.9rem; color: var(--text-muted);" data-lang="verify_subtitle">Чтобы подключиться к нашему кибер-шлюзу, ваш аккаунт должен быть зарегистрирован у брокера.</p>
           
           <div class="verification-box">
-            
             <div class="step-block active-step">
               <div class="step-num" data-lang="verify_step_1_badge">ШАГ 1</div>
               <div class="step-text" data-lang="verify_step_1_text">Зарегистрируйтесь на Pocket Option по нашей официальной ссылке:</div>
@@ -837,7 +1286,6 @@
             </div>
 
             <button class="btn-pixel" id="btnVerifyUid" onclick="handleUidVerification()" style="width: 100%; padding: 12px; font-family: var(--font-retro); font-size: 0.8rem;" data-lang="btn_activate_access">[ АКТИВИРОВАТЬ ДОСТУП ]</button>
-
           </div>
         </div>
       </div>
@@ -850,9 +1298,8 @@
               <div class="status-dot"></div>
               <span data-lang="terminal_radar">РАДАР: АКТИВЕН</span>
             </div>
-            <div id="terminalClock">TIME: --:----</div>
+            <div id="terminalClock">TIME: --:--:--</div>
           </div>
-          
           <div class="signals-log" id="signalsLogContainer">
             <div class="signal-row" style="border: none;">
               <div id="sysConnectText">[СИСТЕМА] Авторизация успешна. Подключение к шлюзу Pocket Option установлено...</div>
@@ -861,7 +1308,6 @@
           </div>
         </div>
       </div>
-
     </section>
 
     <section id="education" class="tab-content">
@@ -869,82 +1315,491 @@
         <h2 class="panel-title" data-lang="edu_main_title">📚 РУКОВОДСТВО ТРЕЙДЕРА</h2>
         <p data-lang="edu_main_desc">Полное интерактивное руководство по использованию платформы Cyber Cyclone для максимизации профита.</p>
       </div>
-      
+
       <div class="edu-grid">
         <div class="edu-card">
           <div class="step-badge">01</div>
           <div class="edu-card-title" data-lang="edu_card1_title">Регистрация и верификация</div>
-          <p data-lang="edu_card1_desc">Создайте аккаунт, подтвердите email и пройдите KYC верификацию для доступа ко всем функциям платформы.</p>
-          <ul class="edu-list">
-            <li data-lang="edu_card1_li1">✅ Быстрая регистрация за 2 минуты</li>
-            <li data-lang="edu_card1_li2">✅ Мгновенная верификация документов</li>
-            <li data-lang="edu_card1_li3">✅ Доступ к демо-счету сразу после регистрации</li>
-          </ul>
+          <p style="font-size:0.85rem;" data-lang="edu_card1_desc">Создайте аккаунт, верифицируйте UID у брокера Pocket Option через вкладку "Сигналы" для разблокировки терминала.</p>
         </div>
-
         <div class="edu-card">
           <div class="step-badge">02</div>
-          <div class="edu-card-title" data-lang="edu_card2_title">Освоение терминала</div>
-          <p data-lang="edu_card2_desc">Изучите интерфейс торгового терминала и основные инструменты для комплексного анализа рынка.</p>
-          <ul class="edu-list">
-            <li data-lang="edu_card2_li1">📊 Настройка рабочих пространств</li>
-            <li data-lang="edu_card2_li2">🔧 Добавление технических индикаторов</li>
-            <li data-lang="edu_card2_li3">⚡ Быстрые клавиши для торговли</li>
-          </ul>
+          <div class="edu-card-title" data-lang="edu_card2_title">Чтение сигналов</div>
+          <p style="font-size:0.85rem;" data-lang="edu_card2_desc">Зеленый сигнал CALL означает сделку ВВЕРХ, красный PUT — сделка ВНИЗ. Обращайте внимание на валютную пару и время экспирации.</p>
         </div>
-
         <div class="edu-card">
           <div class="step-badge">03</div>
-          <div class="edu-card-title" data-lang="edu_card3_title">Торговая стратегия</div>
-          <p data-lang="edu_card3_desc">Разработайте и протестируйте индивидуальную торговую стратегию в безопасной демо-среде.</p>
-          <ul class="edu-list">
-            <li data-lang="edu_card3_li1">🧠 Использование AI-ассистента</li>
-            <li data-lang="edu_card3_li2">📈 Анализ исторических данных</li>
-            <li data-lang="edu_card3_li3">🎯 Оптимизация параметров стратегии</li>
-          </ul>
+          <div class="edu-card-title" data-lang="edu_card3_title">Риск-Менеджмент</div>
+          <p style="font-size:0.85rem;" data-lang="edu_card3_desc">Никогда не инвестируйте более 2-5% от вашего общего баланса в одну сделку. Мани-менеджмент защищает депозит при просадках.</p>
         </div>
-
         <div class="edu-card">
           <div class="step-badge">04</div>
-          <div class="edu-card-title" data-lang="edu_card4_title">Реальная торговля</div>
-          <p data-lang="edu_card4_desc">Начните торговать с реальными средствами, используя все технологические преимущества платформы.</p>
-          <ul class="edu-list">
-            <li data-lang="edu_card4_li1">💳 Пополнение счета</li>
-            <li data-lang="edu_card4_li2">🛡️ Управление рисками</li>
-            <li data-lang="edu_card4_li3">📱 Мобильная торговля</li>
-          </ul>
+          <div class="edu-card-title" data-lang="edu_card4_title">Экспирация</div>
+          <p style="font-size:0.85rem;" data-lang="edu_card4_desc">Наши кибер-сигналы оптимизированы под таймфреймы от 1 до 5 минут. Входите строго в момент публикации строки в логе.</p>
+        </div>
+        <div class="edu-card">
+          <div class="step-badge">05</div>
+          <div class="edu-card-title" data-lang="edu_card5_title">Психология торговли</div>
+          <p style="font-size:0.85rem;" data-lang="edu_card5_desc">Избегайте азарта и тильта. Если вы получили 3 минуса подряд — остановите сессию на сегодня и сохраните свой капитал.</p>
         </div>
       </div>
     </section>
 
   </main>
 
-  <div id="loginModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'loginModal')">
+  <div id="loginModal" class="modal-overlay">
     <div class="modal-box">
-      <button class="close-modal" onclick="closeModal('loginModal')">X</button>
-      <h3 class="panel-title" data-lang="modal_login_title">🔑 Вход</h3>
-      <form onsubmit="handleLogin(event)">
-        <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-input" required></div>
-        <div class="form-group"><label class="form-label" data-lang="modal_field_pass">Пароль</label><input type="password" id="loginPassword" class="form-input" required><div id="loginError" class="error-msg" data-lang="modal_login_error">Ошибка авторизации.</div></div>
-        <button type="submit" class="btn-pixel primary" style="width: 100%;" data-lang="btn_login_submit">Войти</button>
-      </form>
+      <button class="close-modal" onclick="closeModal('loginModal')">[X]</button>
+      <h3 class="panel-title" style="margin-bottom: 16px;" data-lang="modal_login_title">🔐 Авторизация</h3>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input type="email" id="loginEmail" class="form-input" placeholder="cyber-trader@io.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-lang="label_pass">Пароль</label>
+        <input type="password" id="loginPassword" class="form-input" placeholder="******">
+        <div id="loginError" class="error-msg" data-lang="err_fill_fields">Заполните все поля!</div>
+      </div>
+      <button class="btn-pixel primary" style="width: 100%;" onclick="handleLogin()" data-lang="btn_enter">Войти в систему</button>
     </div>
   </div>
 
-  <div id="regModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'regModal')">
+  <div id="regModal" class="modal-overlay">
     <div class="modal-box">
-      <button class="close-modal" onclick="closeModal('regModal')">X</button>
-      <h3 class="panel-title" data-lang="modal_reg_title">📝 Регистрация</h3>
-      <form onsubmit="handleRegister(event)">
-        <div class="form-group"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-input" required></div>
-        <div class="form-group"><label class="form-label" data-lang="modal_field_pass">Пароль</label><input type="password" id="regPassword" class="form-input" required minlength="4"><div id="regError" class="error-msg" data-lang="modal_reg_error">Email занят.</div></div>
-        <button type="submit" class="btn-pixel primary" style="width: 100%;" data-lang="btn_reg_submit">Создать аккаунт</button>
-      </form>
+      <button class="close-modal" onclick="closeModal('regModal')">[X]</button>
+      <h3 class="panel-title" style="margin-bottom: 16px;" data-lang="modal_reg_title">👾 Создать аккаунт</h3>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input type="email" id="regEmail" class="form-input" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-lang="label_pass">Пароль</label>
+        <input type="password" id="regPassword" class="form-input" placeholder="******">
+        <div id="regError" class="error-msg" data-lang="err_fill_fields">Заполните все поля!</div>
+      </div>
+      <button class="btn-pixel primary" style="width: 100%;" onclick="handleRegister()" data-lang="btn_create_acc">Создать профиль</button>
     </div>
   </div>
 
   <footer class="footer">
     <div class="footer-socials">
-      <a href="https://t.me/AlfaSigBot" target="_blank" style="color: var(--blue-neon); text-decoration: none; font-size: 0.8rem; font-weight: bold;" data-lang="footer_bot">[ БОТ ]</a>
-      <a href="https://t.me/+yo75GPfImlBmYWIy" target="_blank" style="color: var(--blue-neon); text-decoration: none; font-size: 0.8rem; font-weight: bold;" data-lang="footer_channel">[ КАНАЛ ]</a>
-      <a href="https://www.instagram.com/ivan_tradeg?igsh=MWE0dGhsM3J6a2R3ZA==" target="_blank" style="color: var(--blue-neon); text-decoration: none; font-size: 0.8rem; font-weight: bold;">[ INSTAGRAM ]</a>
+      <span style="color: var(--blue-neon); font-family: var(--font-retro); font-size: 0.65rem;">CYBER CYCLONE © 2026</span>
+    </div>
+    <div style="max-width: 800px; margin: 0 auto; color: var(--text-muted); font-size: 0.75rem;" data-lang="footer_disclaimer">
+      Предупреждение о рисках: Торговля финансовыми инструментами сопряжена с высокими рисками. Сигналы носят информационный характер.
+    </div>
+  </footer>
+
+  <script>
+    // --- Состояния глобального пользователя ---
+    let currentUser = null;
+    let isUidVerified = false;
+    let currentLang = 'ru';
+
+    // База данных мультиязычности
+    const translations = {
+      ru: {
+        nav_home: "Главная", nav_about: "О нас", nav_signals: "Сигналы", nav_education: "Обучение",
+        btn_login: "Вход", btn_reg: "Регистрация", btn_logout: "Выйти",
+        hero_title: "Торговля в стиле <span>CYBER CYCLONE</span>",
+        hero_desc: "Используйте мощь искусственного интеллекта и передовые алгоритмы для достижения беспрецедентных результатов на финансовых рынках.",
+        btn_activate_terminal: "Активировать Терминал",
+        stat_volume: "Объем торгов", stat_traders: "Трейдеров", stat_execution: "Исполнение",
+        home_benefits_title: "🎯 ПОЧЕМУ ИМЕННО МЫ?",
+        home_b1_title: "Нейросетевой анализ", home_b1_desc: "Наши скрипты непрерывно сканируют более 40 валютных пар, выявляя скрытые паттерны крупных игроков рынков.",
+        home_b2_title: "Абсолютная безопасность", home_b2_desc: "Ваш сквозной UID брокера используется только для автоматической синхронизации и валидации вашего статуса доступа.",
+        home_b3_title: "Рыночная адаптивность", home_b3_desc: "Алгоритм подстраивается под волатильность рынка (OTC и биржевые сессии) в режиме реального времени.",
+        about_title: "🕹️ О проекте Cyber Cyclone", about_desc: "Мы строим самую прозрачную и высокотехнологичную экосистему для трейдеров бинарных опционов. Наш ретро-интерфейс скрывает под капотом мощнейшие скрипты предиктивного анализа.",
+        about_stat_aud: "Постоянных участников", about_stat_vid: "Обучающих видеоматериалов", about_stat_gen: "Генерация сигналов и контента",
+        traders_title: "⚡ КИБЕР-ТРЕЙДЕРЫ ЭКОСИСТЕМЫ", traders_subtitle: "Участники нашего комьюнити, которые используют алгоритмы Cyber Cyclone на полную мощность и демонстрируют стабильный профит.",
+        trader_winrate: "Успешные сделки", trader_profit: "Прибыль (мес)", trader_asset: "Любимая пара", trader_status_trading: "TRADING",
+        about_resources_title: "🔗 Наши официальные ресурсы:",
+        social_bot: "🤖 Telegram Бот", social_channel: "📢 Telegram Канал", social_youtube: "📺 YouTube Канал",
+        sig_lock_title: "Доступ ограничен", sig_lock_desc: "Для просмотра аналитических сигналов необходимо сначала создать аккаунт на нашем сайте.",
+        btn_reg_site: "Зарегистрироваться на сайте",
+        verify_title: "🛡️ Активация доступа к сигналам", verify_subtitle: "Чтобы подключиться к нашему кибер-шлюзу, ваш аккаунт должен быть зарегистрирован у брокера.",
+        verify_step_1_badge: "ШАГ 1", verify_step_1_text: "Зарегистрируйтесь на Pocket Option по нашей официальной ссылке:",
+        btn_register_pocket: "ЗАРЕГИСТРИРОВАТЬСЯ НА POCKET OPTION",
+        verify_step_2_badge: "ШАГ 2", verify_step_2_text: "Введите ваш личный UID (ID аккаунта Pocket Option) для проверки:",
+        verify_error_text: "Ошибка: неверный формат UID или аккаунт не найден в реферальной системе!",
+        btn_activate_access: "[ АКТИВИРОВАТЬ ДОСТУП ]",
+        terminal_title: "📡 Живая лента кибер-сигналов", terminal_radar: "РАДАР: АКТИВЕН",
+        edu_main_title: "📚 РУКОВОДСТВО ТРЕЙДЕРА", edu_main_desc: "Полное интерактивное руководство по использованию платформы Cyber Cyclone для максимизации профита.",
+        edu_card1_title: "Регистрация и верификация", edu_card1_desc: "Создайте аккаунт, верифицируйте UID у брокера Pocket Option через вкладку 'Сигналы' для разблокировки терминала.",
+        edu_card2_title: "Чтение сигналов", edu_card2_desc: "Зеленый сигнал CALL означает сделку ВВЕРХ, красный PUT — сделка ВНИЗ. Обращайте внимание на валютную пару и время экспирации.",
+        edu_card3_title: "Риск-Менеджмент", edu_card3_desc: "Никогда не инвестируйте более 2-5% от вашего общего баланса в одну сделку. Мани-менеджмент защищает депозит при просадках.",
+        edu_card4_title: "Экспирация", edu_card4_desc: "Наши кибер-сигналы оптимизированы под таймфреймы от 1 до 5 минут. Входите строго в момент публикации строки в логе.",
+        edu_card5_title: "Психология торговли", edu_card5_desc: "Избегайте азарта и тильта. Если вы получили 3 минуса подряд — остановите сессию на сегодня и сохраните свой капитал.",
+        modal_login_title: "🔐 Авторизация", modal_reg_title: "👾 Создать аккаунт", label_pass: "Пароль", err_fill_fields: "Заполните все поля!", btn_enter: "Войти в систему", btn_create_acc: "Создать профиль",
+        footer_disclaimer: "Предупреждение о рисках: Торговля финансовыми инструментами сопряжена с высокими рисками. Сигналы носят информационный характер."
+      },
+      uk: {
+        nav_home: "Головна", nav_about: "Про нас", nav_signals: "Сигнали", nav_education: "Навчання",
+        btn_login: "Вхід", btn_reg: "Реєстрація", btn_logout: "Вийти",
+        hero_title: "Торгівля в стилі <span>CYBER CYCLONE</span>",
+        hero_desc: "Використовуйте міць штучного інтелекту та передові алгоритми для досягнення безпрецедентних результатів на фінансових ринках.",
+        btn_activate_terminal: "Активувати Термінал",
+        stat_volume: "Обсяг торгів", stat_traders: "Трейдерів", stat_execution: "Виконання",
+        home_benefits_title: "🎯 ЧОМУ САМЕ МИ?",
+        home_b1_title: "Нейромережевий аналіз", home_b1_desc: "Наші скрипти безперервно сканюють понад 40 валютних пар, виявляючи приховані паттерни великих гравців ринку.",
+        home_b2_title: "Абсолютна безпека", home_b2_desc: "Ваш наскрізний UID брокера використовується тільки для автоматичної синхронізації та валідації вашого статусу доступу.",
+        home_b3_title: "Ринкова адаптивність", home_b3_desc: "Алгоритм підлаштовується под волатильність ринку (OTC та біржові сесії) в режимі реального часу.",
+        about_title: "🕹️ Про проєкт Cyber Cyclone", about_desc: "Ми будуємо найпрозорішу та високотехнологічну екосистему для трейдерів бінарних опціонів. Наш ретро-интерфейс приховує під капотом найпотужніші скрипти предиктивного аналізу.",
+        about_stat_aud: "Постійних учасників", about_stat_vid: "Навчальних відеоматеріалів", about_stat_gen: "Генерація сигналів та контенту",
+        traders_title: "⚡ КІБЕР-ТРЕЙДЕРИ ЕКОСИСТЕМИ", traders_subtitle: "Учасники нашого ком'юніті, які використовують алгоритми Cyber Cyclone на повну потужність і демонструють стабільний профіт.",
+        trader_winrate: "Успішні угоди", trader_profit: "Прибуток (міс)", trader_asset: "Улюблена пара", trader_status_trading: "TRADING",
+        about_resources_title: "🔗 Наші офіційні ресурси:",
+        social_bot: "🤖 Telegram Бот", social_channel: "📢 Telegram Канал", social_youtube: "📺 YouTube Канал",
+        sig_lock_title: "Доступ обмежено", sig_lock_desc: "Для перегляду аналітичних сигналів необхідно спочатку створити аккаунт на нашому сайті.",
+        btn_reg_site: "Зареєструватися на сайті",
+        verify_title: "🛡️ Активація доступу до сигналів", verify_subtitle: "Щоб підключитися до нашого кібер-шлюзу, ваш аккаунт має бути зареєстрований у брокера.",
+        verify_step_1_badge: "КРОК 1", verify_step_1_text: "Зареєструйтеся на Pocket Option за нашим офіційним посиланням:",
+        btn_register_pocket: "ЗАРЕЄСТРУВАТИСЯ НА POCKET OPTION",
+        verify_step_2_badge: "КРОК 2", verify_step_2_text: "Введіть ваш особистий UID (ID аккаунта Pocket Option) для перевірки:",
+        verify_error_text: "Помилка: невірний формат UID або аккаунт не знайдено в реферальній системі!",
+        btn_activate_access: "[ АКТИВУВАТИ ДОСТУП ]",
+        terminal_title: "📡 Жива стрічка кібер-сигналів", terminal_radar: "РАДАР: АКТИВНИЙ",
+        edu_main_title: "📚 КЕРІВНИЦТВО ТРЕЙДЕРА", edu_main_desc: "Повне інтерактивне керівництво з використання платформи Cyber Cyclone для максимізації профіту.",
+        edu_card1_title: "Реєстрація та верифікація", edu_card1_desc: "Створіть аккаунт, верифікуйте UID у брокера Pocket Option через вкладку 'Сигнали' для розблокування терміналу.",
+        edu_card2_title: "Читання сигналів", edu_card2_desc: "Зелений сигнал CALL означає угоду ВГОРУ, червоний PUT — угоду ВНИЗ. Звертайте увагу на валютну пару та час експірації.",
+        edu_card3_title: "Ризик-Менеджмент", edu_card3_desc: "Ніколи не інвестуйте більше 2-5% від вашого загального балансу в одну угоду. Мани-менеджмент захищає депозит при просадках.",
+        edu_card4_title: "Експірація", edu_card4_desc: "Наші кибер-сигнали оптимізовані під таймфрейми від 1 до 5 хвилин. Входьте строго в момент публікації рядка в лозі.",
+        edu_card5_title: "Психологія торгівлі", edu_card5_desc: "Уникайте азарта та тильту. Якщо ви отримали 3 мінуси поспіль — зупиніть сесію на сьогодні та збережіть свій капітал.",
+        modal_login_title: "🔐 Авторизація", modal_reg_title: "👾 Створити аккаунт", label_pass: "Пароль", err_fill_fields: "Заповніть усі поля!", btn_enter: "Увійти в систему", btn_create_acc: "Створити профіль",
+        footer_disclaimer: "Попередження про ризики: Торгівля фінансовими інструментами пов'язана з високими ризиками. Сигнали мають інформаційний характер."
+      },
+      en: {
+        nav_home: "Home", nav_about: "About", nav_signals: "Signals", nav_education: "Education",
+        btn_login: "Login", btn_reg: "Register", btn_logout: "Logout",
+        hero_title: "Trading in <span>CYBER CYCLONE</span> Style",
+        hero_desc: "Harness the power of artificial intelligence and advanced algorithms to achieve unprecedented results in financial markets.",
+        btn_activate_terminal: "Activate Terminal",
+        stat_volume: "Trading Volume", stat_traders: "Active Traders", stat_execution: "Execution Speed",
+        home_benefits_title: "🎯 WHY CHOOSE US?",
+        home_b1_title: "Neural Analytics", home_b1_desc: "Our scripts continuously scan over 40 currency pairs, detecting hidden patterns of large market players.",
+        home_b2_title: "Absolute Security", home_b2_desc: "Your broker UID is used solely for automated synchronization and verification of your subscription status.",
+        home_b3_title: "Market Adaptivity", home_b3_desc: "The algorithm adjusts to market volatility (OTC and exchange sessions) in real-time.",
+        about_title: "🕹️ About Cyber Cyclone", about_desc: "We build the most transparent and high-tech ecosystem for binary options traders. Our retro interface hides powerful predictive analysis scripts under the hood.",
+        about_stat_aud: "Regular Members", about_stat_vid: "Educational Videos", about_stat_gen: "Signal & Content Generation",
+        traders_title: "⚡ ECOSYSTEM CYBER TRADERS", traders_subtitle: "Members of our community who use Cyber Cyclone algorithms at full capacity and demonstrate stable profits.",
+        trader_winrate: "Win Rate", trader_profit: "Profit (Mo)", trader_asset: "Favorite Pair", trader_status_trading: "TRADING",
+        about_resources_title: "🔗 Our Official Resources:",
+        social_bot: "🤖 Telegram Bot", social_channel: "📢 Telegram Channel", social_youtube: "📺 YouTube Channel",
+        sig_lock_title: "Access Denied", sig_lock_desc: "To view analytical signals, you must first create an account on our website.",
+        btn_reg_site: "Register Now",
+        verify_title: "🛡️ Activate Signal Access", verify_subtitle: "To connect to our cyber gateway, your account must be registered with the broker.",
+        verify_step_1_badge: "STEP 1", verify_step_1_text: "Register at Pocket Option via our official link:",
+        btn_register_pocket: "REGISTER AT POCKET OPTION",
+        verify_step_2_badge: "STEP 2", verify_step_2_text: "Enter your personal UID (Pocket Option Account ID) for verification:",
+        verify_error_text: "Error: invalid UID format or account not found in the referral system!",
+        btn_activate_access: "[ ACTIVATE ACCESS ]",
+        terminal_title: "📡 Cyber Signals Live Feed", terminal_radar: "RADAR: ACTIVE",
+        edu_main_title: "📚 TRADER'S GUIDE", edu_main_desc: "Complete interactive guide on using the Cyber Cyclone platform to maximize your profits.",
+        edu_card1_title: "Registration & Verification", edu_card1_desc: "Create an account, verify your broker UID via the 'Signals' tab to unlock the matrix terminal.",
+        edu_card2_title: "Reading Signals", edu_card2_desc: "Green CALL signal means UP trade, red PUT signal means DOWN trade. Pay close attention to currency pair and expiration.",
+        edu_card3_title: "Risk Management", edu_card3_desc: "Never invest more than 2-5% of your total balance into a single trade. Money management protects your deposit.",
+        edu_card4_title: "Expiration", edu_card4_desc: "Our cyber signals are optimized for 1 to 5 minute timeframes. Enter strictly at the exact moment of log publication.",
+        edu_card5_title: "Psychology", edu_card5_desc: "Avoid greed and tilt. If you get 3 losses in a row, close the terminal for today and preserve your capital.",
+        modal_login_title: "🔐 Authorization", modal_reg_title: "👾 Create Account", label_pass: "Password", err_fill_fields: "Fill all fields!", btn_enter: "Login to System", btn_create_acc: "Create Profile",
+        footer_disclaimer: "Risk Warning: Financial trading carries high risks. Signals are for informational purposes only."
+      },
+      de: { nav_home: "Startseite", nav_about: "Über uns", nav_signals: "Signale", nav_education: "Anleitung" },
+      pl: { nav_home: "Główna", nav_about: "O nas", nav_signals: "Sygnały", nav_education: "Edukacja" },
+      hu: { nav_home: "Főoldal", nav_about: "Rólunk", nav_signals: "Jelek", nav_education: "Oktatás" }
+    };
+
+    // Функция смены языка по дата-атрибутам
+    function changeLanguage(lang) {
+      if (!translations[lang]) return;
+      currentLang = lang;
+      
+      const elements = document.querySelectorAll('[data-lang]');
+      elements.forEach(el => {
+        const key = el.getAttribute('data-lang');
+        if (translations[lang][key]) {
+          if (translations[lang][key].includes('<span')) {
+            el.innerHTML = translations[lang][key];
+          } else {
+            el.textContent = translations[lang][key];
+          }
+        }
+      });
+    }
+
+    // Переключение табов сайта
+    function switchTab(tabId, btnElement = null) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+
+      const navBtns = document.querySelectorAll('.nav-btn');
+      navBtns.forEach(btn => btn.classList.remove('active'));
+
+      if (btnElement) {
+        btnElement.classList.add('active');
+      } else {
+        const targetBtn = Array.from(navBtns).find(btn => btn.getAttribute('onclick').includes(tabId));
+        if (targetBtn) targetBtn.classList.add('active');
+      }
+
+      if (tabId === 'signals') {
+        updateSignalsTabState();
+      }
+    }
+
+    function updateSignalsTabState() {
+      const guestView = document.getElementById('signalsStateGuest');
+      const verifyView = document.getElementById('signalsStateVerify');
+      const unlockedView = document.getElementById('signalsStateUnlocked');
+
+      if (!currentUser) {
+        guestView.style.display = 'block';
+        verifyView.style.display = 'none';
+        unlockedView.style.display = 'none';
+      } else if (!isUidVerified) {
+        guestView.style.display = 'none';
+        verifyView.style.display = 'block';
+        unlockedView.style.display = 'none';
+      } else {
+        guestView.style.display = 'none';
+        verifyView.style.display = 'none';
+        unlockedView.style.display = 'block';
+      }
+    }
+
+    // Модальные окна
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+      const errs = document.querySelectorAll('.error-msg');
+      errs.forEach(e => e.style.display = 'none');
+    }
+
+    // Авторизация
+    function handleLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPassword').value;
+      if (!email || !pass) {
+        document.getElementById('loginError').style.display = 'block';
+        return;
+      }
+      currentUser = { email: email };
+      closeModal('loginModal');
+      updateAuthUI();
+    }
+
+    function handleRegister() {
+      const email = document.getElementById('regEmail').value;
+      const pass = document.getElementById('regPassword').value;
+      if (!email || !pass) {
+        document.getElementById('regError').style.display = 'block';
+        return;
+      }
+      currentUser = { email: email };
+      closeModal('regModal');
+      updateAuthUI();
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      isUidVerified = false;
+      document.getElementById('pocketUidInput').value = '';
+      updateAuthUI();
+      switchTab('home');
+    }
+
+    function updateAuthUI() {
+      const guestBlock = document.getElementById('guestBlock');
+      const userBlock = document.getElementById('userBlock');
+      const userEmailText = document.getElementById('userEmailText');
+
+      if (currentUser) {
+        guestBlock.style.display = 'none';
+        userBlock.style.display = 'flex';
+        userEmailText.textContent = currentUser.email;
+      } else {
+        guestBlock.style.display = 'flex';
+        userBlock.style.display = 'none';
+      }
+      updateSignalsTabState();
+    }
+
+    // Проверка UID
+    function handleUidVerification() {
+      const uidInput = document.getElementById('pocketUidInput').value.trim();
+      const errorDiv = document.getElementById('verifyError');
+      if (/^\d{5,12}$/.test(uidInput)) {
+        errorDiv.style.display = 'none';
+        isUidVerified = true;
+        updateSignalsTabState();
+        startSignalGeneration();
+      } else {
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    // Интерактивный генератор сигналов
+    let signalInterval = null;
+    const assets = ["EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "EUR/JPY", "Crypto IDX", "Apple OTC", "Bitcoin"];
+
+    function startSignalGeneration() {
+      if (signalInterval) clearInterval(signalInterval);
+      const container = document.getElementById('signalsLogContainer');
+      
+      signalInterval = setInterval(() => {
+        if (!isUidVerified) return;
+        const randomAsset = assets[Math.floor(Math.random() * assets.length)];
+        const isCall = Math.random() > 0.45;
+        const directionClass = isCall ? 'call' : 'put';
+        const directionText = isCall ? 'CALL (ВВЕРХ) ▲' : 'PUT (ВНИЗ) ▼';
+        const randomTime = Math.random() > 0.5 ? '1 MIN' : '5 MIN';
+        const timeNow = new Date().toLocaleTimeString();
+
+        const row = document.createElement('div');
+        row.className = 'signal-row';
+        row.innerHTML = `
+          <div>[${timeNow}] <span style="color:#fff; font-weight:bold;">${randomAsset}</span> | <span class="signal-direction ${directionClass}">${directionText}</span> | Срок: ${randomTime}</div>
+          <div style="color: var(--green-pixel); font-family:var(--font-retro); font-size:0.6rem;">[АКТИВЕН]</div>
+        `;
+        container.insertBefore(row, container.firstChild);
+        if (container.children.length > 15) {
+          container.removeChild(container.lastChild);
+        }
+      }, 4000);
+    }
+
+    setInterval(() => {
+      const clockEl = document.getElementById('terminalClock');
+      if (clockEl) clockEl.textContent = "TIME: " + new Date().toLocaleTimeString();
+    }, 1000);
+
+    // Живой пиксельный график на главной (Canvas)
+    const chartCanvas = document.getElementById('liveChartCanvas');
+    const chartCtx = chartCanvas?.getContext('2d');
+    let chartData = Array.from({length: 40}, () => 110 + Math.random() * 40);
+
+    function resizeChart() {
+      if (!chartCanvas) return;
+      chartCanvas.width = chartCanvas.parentElement.clientWidth;
+      chartCanvas.height = chartCanvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeChart);
+    resizeChart();
+
+    function drawLiveChart() {
+      if (!chartCtx || !chartCanvas) return;
+      chartCtx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+      chartData.push(chartData[chartData.length - 1] + (Math.random() * 12 - 6));
+      chartData.shift();
+
+      for(let k=0; k<chartData.length; k++) {
+        if(chartData[k] < 20) chartData[k] = 30;
+        if(chartData[k] > chartCanvas.height - 20) chartData[k] = chartCanvas.height - 30;
+      }
+
+      const stepX = chartCanvas.width / (chartData.length - 1);
+      chartCtx.beginPath();
+      chartCtx.moveTo(0, chartCanvas.height);
+      for (let i = 0; i < chartData.length; i++) {
+        chartCtx.lineTo(i * stepX, chartData[i]);
+      }
+      chartCtx.lineTo(chartCanvas.width, chartCanvas.height);
+      chartCtx.closePath();
+      
+      const fillGradient = chartCtx.createLinearGradient(0, 0, 0, chartCanvas.height);
+      fillGradient.addColorStop(0, 'rgba(59, 130, 246, 0.15)');
+      fillGradient.addColorStop(1, 'rgba(4, 8, 17, 0)');
+      chartCtx.fillStyle = fillGradient;
+      chartCtx.fill();
+
+      chartCtx.beginPath();
+      chartCtx.strokeStyle = '#3b82f6';
+      chartCtx.lineWidth = 3;
+      for (let i = 0; i < chartData.length; i++) {
+        if (i === 0) chartCtx.moveTo(0, chartData[i]);
+        else chartCtx.lineTo(i * stepX, chartData[i]);
+      }
+      chartCtx.stroke();
+
+      const lastX = (chartData.length - 1) * stepX;
+      const lastY = chartData[chartData.length - 1];
+      const pulseRadius = 5 + Math.abs(Math.sin(Date.now() / 150) * 4);
+      chartCtx.beginPath();
+      chartCtx.arc(lastX, lastY, pulseRadius, 0, Math.PI * 2);
+      chartCtx.fillStyle = 'rgba(0, 255, 170, 0.4)';
+      chartCtx.fill();
+
+      chartCtx.beginPath();
+      chartCtx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+      chartCtx.fillStyle = '#00ffaa';
+      chartCtx.fill();
+    }
+    setInterval(drawLiveChart, 140);
+
+
+    // ── ОБНОВЛЕННЫЙ СКРИПТ: Яркое и плотное свечение пикселей строго под курсором ──
+    const canvas = document.getElementById("pixelCanvas");
+    const ctx = canvas.getContext("2d");
+    let pixelsArray = [];
+
+    function resizeGlobalCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeGlobalCanvas);
+    resizeGlobalCanvas();
+
+    class Particle {
+      constructor(x, y) {
+        // Округляем до пиксельной сетки 6px для четкого ретро-вида
+        this.x = Math.floor((x + (Math.random() * 16 - 8)) / 6) * 6; 
+        this.y = Math.floor((y + (Math.random() * 16 - 8)) / 6) * 6;
+        this.size = 5; 
+        this.alpha = 1.0;
+        this.decay = Math.random() * 0.03 + 0.03; // Время жизни пикселя
+        this.color = Math.random() > 0.5 ? '#3b82f6' : '#00ffaa'; 
+      }
+      draw() {
+        // Отрисовка внутреннего яркого ядра пикселя
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.alpha;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+
+        // Дополнительный радиальный оверлей для эффекта свечения
+        ctx.fillStyle = this.color === '#3b82f6' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(0, 255, 170, 0.2)';
+        ctx.fillRect(this.x - 2, this.y - 2, this.size + 4, this.size + 4);
+      }
+      update() {
+        this.alpha -= this.decay;
+      }
+    }
+
+    window.addEventListener("mousemove", (e) => {
+      // Генерируем от 3 до 5 ярких пикселей за раз для плотного красивого шлейфа
+      const count = Math.floor(Math.random() * 3) + 3;
+      for (let i = 0; i < count; i++) {
+        pixelsArray.push(new Particle(e.clientX, e.clientY));
+      }
+    });
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < pixelsArray.length; i++) {
+        pixelsArray[i].update();
+        pixelsArray[i].draw();
+        
+        if (pixelsArray[i].alpha <= 0) {
+          pixelsArray.splice(i, 1);
+          i--;
+        }
+      }
+      ctx.globalAlpha = 1.0; 
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+  </script>
+</body>
+</html>
